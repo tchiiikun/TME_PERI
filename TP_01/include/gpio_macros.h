@@ -1,11 +1,5 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <unistd.h>
-
+#ifndef _GPIO_MACROS_H_
+#define _GPIO_MACROS_H_
 /*
  * Base of peripherals and base of GPIO controller.
  */
@@ -58,4 +52,4 @@
 #define GPIO_VALUE( ptr, gpio ) \
     ( ( GPIO_CONF_REG( ptr, 0x34, gpio ) >> ( (gpio) % 32 ) ) & 0x1 )
 
-    
+#endif
