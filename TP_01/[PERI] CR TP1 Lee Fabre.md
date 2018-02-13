@@ -102,9 +102,8 @@ On a choisi d'alterner les deux LEDS, lorsqu'une des LEDS s'allume, l'autre LED 
 
 &nbsp;
 
-Après avoir traiter le cas des sorties, on passe en mode "entrée".
-
-La GPIO18 va être connecté avec le bouton poussoir BTN0.
+Après avoir traiter le cas en mode "sortie", on utilise la GPIO en mode "entrée".
+Pour cela, on doit détecter le bouton poussoir, connecté sur le GPIO18, dans une boucle infinie.
 
 A toutes les 20 ms, on détecte le signal émis par le bouton poussoir.
 Si un appuie a été effectué à ce moment là, on a un clignotement de la LED0, sinon ce sera la LED1 qui clignoterait.
@@ -113,8 +112,9 @@ Si un appuie a été effectué à ce moment là, on a un clignotement de la LED0
 
 ## 5. Réalisation d'une petite librairie
 
-Pour alléger les fonctions qu'on écrit et qu'on écrira dans les autres TPs, on crée une librairie de fonction où contienne toutes les fonctions principales utilisées.
+&nbsp;
 
+Pour alléger les fonctions qu'on écrit et qu'on écrira dans les autres TPs, on crée une librairie de fonction à partir des fonctions et des macros définies au début du TP.
 
 
 
