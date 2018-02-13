@@ -39,26 +39,26 @@
  */
 
 #define GPIO_CONF_FUNC_REG( ptr, gpio ) \
-    *( (ptr) + ( (gpio) / 10 ) ) 
+    *( (ptr) + ( (gpio) / 10 ) )
 
 #define GPIO_CONF_FUNC_INPUT_MASK( gpio ) \
-    ( ~( 0x7 << ( ( (gpio) % 10 ) * 3 ) ) ) 
+    ( ~( 0x7 << ( ( (gpio) % 10 ) * 3 ) ) )
 
 #define GPIO_CONF_FUNC_OUTPUT_MASK( gpio ) \
-    ( 0x1 << ( ( (gpio) % 10 ) * 3 ) ) 
+    ( 0x1 << ( ( (gpio) % 10 ) * 3 ) )
 
 #define GPIO_CONF_AS_INPUT( ptr, gpio ) \
-    GPIO_CONF_FUNC_REG( ptr, gpio ) &= GPIO_CONF_FUNC_INPUT_MASK( gpio ) 
+    GPIO_CONF_FUNC_REG( ptr, gpio ) &= GPIO_CONF_FUNC_INPUT_MASK( gpio )
 
 #define GPIO_CONF_AS_OUTPUT( ptr, gpio ) \
     do { \
         GPIO_CONF_AS_INPUT( ptr, gpio ); \
         GPIO_CONF_FUNC_REG( ptr, gpio ) |= \
             GPIO_CONF_FUNC_OUTPUT_MASK( gpio ); \
-    } while ( 0 ) 
+    } while ( 0 )
 
 #define GPIO_CONF_REG( ptr, addr, gpio ) \
-    *( (ptr) + ( ( (addr) / sizeof( uint32_t ) ) + ( (gpio) / 32 ) ) ) 
+    *( (ptr) + ( ( (addr) / sizeof( uint32_t ) ) + ( (gpio) / 32 ) ) )
 
 #define GPIO_SET_REG( ptr, gpio ) \
     GPIO_CONF_REG( ptr, 0x1c, gpio )
@@ -67,13 +67,13 @@
     GPIO_CONF_REG( ptr, 0x28, gpio )
 
 #define GPIO_SET( ptr, gpio ) \
-    GPIO_SET_REG( ptr, gpio ) = 1 << ( (gpio) % 32 ) 
+    GPIO_SET_REG( ptr, gpio ) = 1 << ( (gpio) % 32 )
 
 #define GPIO_CLR( ptr, gpio ) \
     GPIO_CLR_REG( ptr, gpio ) = 1 << ( (gpio) % 32 )
 
 #define GPIO_VALUE( ptr, gpio ) \
-    ( ( GPIO_CONF_REG( ptr, 0x34, gpio ) >> ( (gpio) % 32 ) ) & 0x1 ) 
+    ( ( GPIO_CONF_REG( ptr, 0x34, gpio ) >> ( (gpio) % 32 ) ) & 0x1 )
 
 /*
  * Setup the access to memory-mapped I/O.
@@ -81,8 +81,7 @@
 
 static int mmap_fd;
 
-int setup_gpio_mmap ( uint32_t volatile ** ptr )
-{
+int setup_gpio_mmap ( uint32_t volatile ** ptr ){
     void * mmap_result;
 
     mmap_fd = open ( "/dev/mem", O_RDWR | O_SYNC );
@@ -109,13 +108,11 @@ int setup_gpio_mmap ( uint32_t volatile ** ptr )
     return 0;
 }
 
-void teardown_gpio_mmap ( void * ptr )
-{
+void teardown_gpio_mmap ( void * ptr ){
     munmap ( ptr, RPI_BLOCK_SIZE );
 }
 
-void delay ( unsigned int milisec )
-{
+void delay ( unsigned int milisec ){
     struct timespec ts, dummy;
     ts.tv_sec  = ( time_t ) milisec / 1000;
     ts.tv_nsec = ( long ) ( milisec % 1000 ) * 1000000;
@@ -131,18 +128,15 @@ void delay ( unsigned int milisec )
 
 #define GPIO_LED0   4
 #define GPIO_LED1   17
-
 #define GPIO_BTN0   18
 
-int
-main ( int argc, char **argv )
-{
+int main ( int argc, char **argv ){
 
 		int period = 1000; /* default = 1Hz */
     if ( argc > 1 ) {
         period = atoi ( argv[1] );
     }
-    
+
     inputButtonPress(period);
 }
 
@@ -150,8 +144,8 @@ void OutputLed(int period){
 		int                 result_4;
     int                 result_17;
     int                 half_period;
-    uint32_t volatile * gpio_4 = 4; 
-    uint32_t volatile * gpio_17 = 17; 
+    uint32_t volatile * gpio_4 = 4;
+    uint32_t volatile * gpio_17 = 17;
 
     /* Retreive the mapped GPIO memory. */
     result_4 = setup_gpio_mmap ( &gpio_4 );
@@ -162,7 +156,7 @@ void OutputLed(int period){
         exit ( 1 );
     }
 
-    
+
     half_period = period / 2;
 
     /* Setup GPIO of LED0 to output. */
@@ -183,9 +177,9 @@ void OutputLed(int period){
         GPIO_CLR ( gpio_17, GPIO_LED1 );
         delay ( half_period );
     }
-    
+
    // teardown_gpio_mmap ( &gpio_base );
-    
+
     return;
 
 }
@@ -195,9 +189,9 @@ void inputButtonPress(int period) {
     int                 result_17;
     int                 result_18;
     int                 half_period;
-    uint32_t volatile * gpio_4 = 4; 
-    uint32_t volatile * gpio_17 = 17; 
-    uint32_t volatile * gpio_18 = 18; 
+    uint32_t volatile * gpio_4 = 4;
+    uint32_t volatile * gpio_17 = 17;
+    uint32_t volatile * gpio_18 = 18;
 
     /* Retreive the mapped GPIO memory. */
     result_4 = setup_gpio_mmap ( &gpio_4 );
@@ -227,16 +221,16 @@ void inputButtonPress(int period) {
 		while(1) {
 			 delay(20);
 			 val_nouv = GPIO_VALUE( gpio_18, GPIO_BTN0 );
-			 
+
 			 if ((val_prec != val_nouv) && (val_nouv == 0)) {
 			 	printf("appui est detecte\n");
 			 	BP_ON = 1;
 			 }
-			 
+
 			 if (GPIO_VALUE( gpio_18, GPIO_BTN0 ) == 1) {
 			  	BP_OFF = 1;
 			 }
-			 
+
 			 if (BP_ON == 1) {
 				  BP_ON = 0;                  // l'appui est un evenement ponctuel
 				 	GPIO_SET ( gpio_4, GPIO_LED0 );
@@ -244,19 +238,18 @@ void inputButtonPress(int period) {
         	GPIO_CLR ( gpio_4, GPIO_LED0 );
         	delay ( half_period );
 			 }
-			 
+
 			 if (BP_OFF == 1) {
-				  	BP_OFF = 0;                // Le relachemet est un évènement ponctuel 
+				  	BP_OFF = 0;                // Le relachemet est un ï¿½vï¿½nement ponctuel
 				  	GPIO_SET ( gpio_17, GPIO_LED1 );
         		delay ( half_period );
         		GPIO_CLR ( gpio_17, GPIO_LED1 );
         		delay ( half_period );
 			 }
-		} 
+		}
    teardown_gpio_mmap ( &gpio_18 );
    teardown_gpio_mmap ( &gpio_4 );
    teardown_gpio_mmap ( &gpio_17 );
-    
+
     return;
 }
-
