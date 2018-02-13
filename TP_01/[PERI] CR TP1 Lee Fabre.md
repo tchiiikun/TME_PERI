@@ -94,9 +94,11 @@ On a choisi d'alterner les deux LEDS, lorsqu'une des LEDS s'allume, l'autre LED 
 
 &nbsp;
 
+Dans cette partie, on doit utiliser la GPIO en mode entrée, détecter le bouton poussoir dans une boucle infinie.
+
+
 ## 5. Réalisation d'une petite librairie
 
-Dans cette partie, on doit utiliser la GPIO en mode entrée, détecter le bouton poussoir dans une boucle infinie.
 
 &nbsp;
 
