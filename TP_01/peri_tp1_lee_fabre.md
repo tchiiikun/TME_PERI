@@ -89,6 +89,8 @@ On récupère le dossier qui contient les fichiers nécessaires :
 
 On observe que la LED s'allume et d'éteigne de manière alterner.
 
+> Code à compléter
+
 &nbsp;
 
 ## 3. Contrôle de plusieurs GPIO en mode "sortie"
@@ -533,8 +535,3 @@ Pour cela, on divisé cette librairie en plusieurs fichiers :
 	    ts.tv_nsec = ( long ) ( milisec % 1000 ) * 1000000;
 	    nanosleep ( &ts, &dummy );
 	}
-
-
-
-
-
