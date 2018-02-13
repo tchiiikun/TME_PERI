@@ -94,8 +94,13 @@ On a choisi d'alterner les deux LEDS, lorsqu'une des LEDS s'allume, l'autre LED 
 
 &nbsp;
 
+## 5. Réalisation d'une petite librairie
 
+Dans cette partie, on doit utiliser la GPIO en mode entrée, détecter le bouton poussoir dans une boucle infinie.
 
+&nbsp;
+
+Dans cette partie, créer une librairie à partir des fonctions et des macros définies au début du tp.
 
 
 
