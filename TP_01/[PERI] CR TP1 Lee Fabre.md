@@ -25,6 +25,8 @@ Pour éviter de mettre le mot de passe à chaque connexion, il faut :
 	ssh-copy-id -i .ssh/id_rsa.pub "-p 5022 pi@132.227.102.36"
 	ssh -p 5022 pi@132.227.102.36
 
+&nbsp;
+
 ## 1. Prise en mains des outils de développement: Hello World !
 
 &nbsp;
@@ -58,6 +60,8 @@ et écrire un **Makefile** pour le compiler et l'envoyer sur la Rasbpberry :
 	clean:
 		rm $(APP)
 
+&nbsp;
+
 ## 2. Contrôle de GPIO en sortie
 
 &nbsp;
@@ -79,6 +83,8 @@ Cf voir : *lab1_ex1.c*
 
 On observe que la LED s'allume et d'éteigne de manière alterner.
 
+&nbsp;
+
 ## 3. Contrôle de plusieurs GPIO en mode "sortie"
 
 &nbsp;
@@ -90,19 +96,26 @@ Dans cette partie, on doit faire clignoté les deux LEDS :
 
 On a choisi d'alterner les deux LEDS, lorsqu'une des LEDS s'allume, l'autre LED s'éteigne.
 
+&nbsp;
+
 ## 4. Lecture de la valeur d'une entrée GPIO
 
 &nbsp;
 
-Dans cette partie, on doit utiliser la GPIO en mode entrée, détecter le bouton poussoir dans une boucle infinie.
+Après avoir traiter le cas en mode "sortie", on utilise la GPIO en mode "entrée".
+Pour cela, on doit détecter le bouton poussoir, connecté sur le GPIO18, dans une boucle infinie.
 
-
-## 5. Réalisation d'une petite librairie
-
+A toutes les 20 ms, on détecte le signal émis par le bouton poussoir.
+Si un appuie a été effectué à ce moment là, on a un clignotement de la LED0, sinon ce sera la LED1 qui clignoterait.
 
 &nbsp;
 
-Dans cette partie, créer une librairie à partir des fonctions et des macros définies au début du tp.
+## 5. Réalisation d'une petite librairie
+
+&nbsp;
+
+Pour alléger les fonctions qu'on écrit et qu'on écrira dans les autres TPs, on crée une librairie de fonction à partir des fonctions et des macros définies au début du TP.
+
 
 
 
