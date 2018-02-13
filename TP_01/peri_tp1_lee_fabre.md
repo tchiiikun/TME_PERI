@@ -7,7 +7,7 @@
 ## 0. Plateforme de développement
 &nbsp;
 
-La Raspberry qui nous a été attribué est la Rasberry 22.
+La Raspberry qui nous a été attribué est la Raspberry 22.
 
 Pour se connecter à la Raspberry PI, il faut écrire : 
 
@@ -46,7 +46,7 @@ Avant toute chose, il faut écrire un programme C pour afficher **"Hello World !
 		return 0;
 	}
 
-et écrire un **Makefile** pour le compiler et l'envoyer sur la Rasbpberry : 
+et écrire un **Makefile** pour le compiler et l'envoyer sur la Raspberry : 
 
 	NAME=lee-fabre
 	CARD=22
@@ -87,7 +87,7 @@ On récupère le dossier qui contient les fichiers nécessaires :
 
 	cp -rp /users/enseig/franck/peri/lab1
 
-On observe que la LED s'allume et d'éteigne de manière alterner.
+On observe que la LED s'allume et s'éteigne de manière alterner.
 
 > Code à compléter
 
@@ -370,7 +370,7 @@ Si un appuie a été effectué à ce moment là, on a un clignotement de la LED0
 
 Pour alléger les fonctions qu'on écrit et qu'on écrira dans les autres TPs, on crée une librairie de fonction à partir des fonctions et des macros définies au début du TP.
 
-Pour cela, on divisé cette librairie en plusieurs fichiers :
+Pour cela, on a divisé cette librairie en plusieurs fichiers :
 	
 **gpio_macros.h :**
 
