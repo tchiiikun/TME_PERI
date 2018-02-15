@@ -5,9 +5,9 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <stdint.h>
-#include <gpio.h>
+#include "gpio.h"
+#include "gpio_value.h"
 
-uint32_t volatile* gpio_base_p;
 
 int gpio_read(int gpio, int * val, uint32_t volatile*  ptr){
 
@@ -17,6 +17,10 @@ int gpio_read(int gpio, int * val, uint32_t volatile*  ptr){
 
 int gpio_update(int gpio, int val, uint32_t volatile*  ptr){
 
-      val == 1 ? GPIO_SET (ptr, gpio) :  GPIO_CLR (ptr, gpio);
+      if (val == 1) {
+       	GPIO_SET (ptr, gpio);
+       } else {
+        GPIO_CLR (ptr, gpio);
+       }
       return 0;
 }

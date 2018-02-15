@@ -5,7 +5,9 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <stdint.h>
-#include <gpio_macros.h>
+#include <time.h>
+#include "gpio.h"
+#include "gpio_setup.h"
 
 
 static int mmap_fd;
@@ -46,7 +48,11 @@ int setup_gpio_mmap(uint32_t volatile ** ptr){
 **/
 int gpio_setup_io(int gpio, int direction, uint32_t volatile*  ptr) {
 
-    direction ? GPIO_CONF_AS_INPUT (ptr, gpio) : GPIO_CONF_AS_OUTPUT (ptr, gpio);
+    if (direction == 1) {
+    	 		GPIO_CONF_AS_INPUT (ptr, gpio);
+    	 } else {
+    	 	 	GPIO_CONF_AS_OUTPUT (ptr, gpio);
+    	 }
     return 0;
 }
 /**

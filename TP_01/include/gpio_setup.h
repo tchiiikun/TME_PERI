@@ -1,6 +1,8 @@
 #ifndef _GPIO_SETUP_H_
 #define _GPIO_SETUP_H_
 
+#include <stdint.h>
+
 /**
   * L'adresse de base des registres GPIO dans l'espace d'adressage physique est supposée connue,
   * mais nous verrons que l'on peut savoir où se trouve les GPIO en lisant des variables exposées par le noyau.
@@ -17,7 +19,7 @@ int gpio_setup_io(int gpio, int direction, uint32_t volatile*  ptr);
 /**
   * unmap
   **/
-void teardown_gpio_mmap(void * ptr){;
+void teardown_gpio_mmap(void * ptr);
 
 /**
   * Fait un sleep

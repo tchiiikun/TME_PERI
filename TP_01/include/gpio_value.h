@@ -1,6 +1,7 @@
 #ifndef _GPIO_VALUE_H_
 #define _GPIO_VALUE_H_
 
+#include <stdint.h>
 
 /**
   * Lecture d'une broche
