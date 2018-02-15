@@ -1,11 +1,7 @@
-&nbsp;
-
 # <center> TP1 : Outils de développement et GPIO </center>
 
-&nbsp;
-
 ## 0. Plateforme de développement
-&nbsp;
+
 
 La Raspberry qui nous a été attribué est la Raspberry 22.
 
@@ -25,11 +21,7 @@ Pour éviter de mettre le mot de passe à chaque connexion, il faut :
 	ssh-copy-id -i .ssh/id_rsa.pub "-p 5022 pi@132.227.102.36"
 	ssh -p 5022 pi@132.227.102.36
 
-&nbsp;
-
 ## 1. Prise en mains des outils de développement: Hello World !
-
-&nbsp;
 
 Pour pouvoir utiliser le compilateur, on doit le configurer dans le terminal et le vérifier :
 
@@ -69,11 +61,7 @@ et écrire un **Makefile** pour le compiler et l'envoyer sur la Raspberry :
 	clean:
 		rm -f *.o *.x *~ *.a
 
-&nbsp;
-
 ## 2. Contrôle de GPIO en sortie
-
-&nbsp;
 
 Pour pouvoir manipuler une pin du GPIO en mode "sortie" pour contrôler le clignotement d'une LED à une fréquence donnée. 
 
@@ -250,12 +238,7 @@ On observe que la LED s'allume et s'éteigne de manière alterner.
 	    return 0;
 	}
 
-
-&nbsp;
-
 ## 3. Contrôle de plusieurs GPIO en mode "sortie"
-
-&nbsp;
 
 Dans cette partie, on doit faire clignoté les deux LEDS : 
 
@@ -433,11 +416,7 @@ On a choisi d'alterner les deux LEDS, lorsqu'une des LEDS s'allume, l'autre LED 
 	    return 0;
 	}
 
-&nbsp;
-
 ## 4. Lecture de la valeur d'une entrée GPIO
-
-&nbsp;
 
 Après avoir traiter le cas en mode "sortie", on utilise la GPIO en mode "entrée".
 Pour cela, on doit détecter le bouton poussoir, connecté sur le GPIO18, dans une boucle infinie.
@@ -690,12 +669,7 @@ Si un appuie a été effectué à ce moment là, on a un clignotement de la LED0
 		return;
 	}
 
-
-&nbsp;
-
 ## 5. Réalisation d'une petite librairie
-
-&nbsp;
 
 Pour alléger les fonctions qu'on écrit et qu'on écrira dans les autres TPs, on crée une librairie de fonction à partir des fonctions et des macros définies au début du TP.
 
