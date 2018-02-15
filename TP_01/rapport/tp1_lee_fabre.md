@@ -1,5 +1,7 @@
 # <center> TP1 : Outils de développement et GPIO </center>
 
+&nbsp;
+
 ## 0. Plateforme de développement
 
 La Raspberry qui nous a été attribué est la Raspberry 22.
@@ -88,7 +90,7 @@ Si un appuie a été effectué à ce moment là, la LED0 clignore, sinon ce sera
 	
 Pour cela, on a ajouté :
 
-* une nouvelle BTN : `GPIO_BTN0` qui aura comme valeur 18 et qui va être connecté à un pointeur `*gpio_base_18`,
+* un nouveau BTN : `GPIO_BTN0` qui aura comme valeur 18 et qui va être connecté à un pointeur `*gpio_base_18`,
 * une nouvelle projection en mémoire : `setup_gpio_mmap ( &gpio_base_18 );`,
 * la configuration pour connecter le GPIO à la LED1	en entrée : `GPIO_CONF_AS_INPUT ( gpio_base_18, GPIO_BTN0 );`,
 * les commandes pour clignoter la LED1 avec `GPIO_SET` et `GPIO_CLR` selon l'appui sur le bouton poussoir.
@@ -100,10 +102,10 @@ Pour alléger les fonctions qu'on écrit et qu'on écrira dans les autres TPs, o
 Pour cela, on a divisé cette librairie en plusieurs fichiers :
 	
 * **gpio_macros.h** contenant tous les macros
-* **gpio_value.h / gpio_value.c** contenant les fonctions :
-	* `int gpio_read(int gpio, int * val, uint32_t volatile*  ptr);` qui permet de récupérer `GPIO_VALUE`,
+* **gpio\_value.h gpio_value.c** contenant les fonctions :
+	* `int gpio_read(int gpio, int * val, uint32_t volatile*  ptr);` qui permet de lire une broche à partir de `GPIO_VALUE`,
 	* `int gpio_update(int gpio, int val, uint32_t volatile*  ptr);` qui permet de mettre à jour l'état de la broche en choisissant entre `GPIO_SET` et `GPIO_CLR`.
-* **gpio_setup.c** contenant les fonctions : 
+* **gpio\_setup.h gpio_setup.c** contenant les fonctions : 
 	* `int setup_gpio_mmap(uint32_t volatile ** ptr);` qui permet d'établire une projection en mémoire de la broche.
 	* `int gpio_setup_io(int gpio, int direction, uint32_t volatile*  ptr);` qui permet la configuration des broches en INPUT ou OUTPUT,
 	* `void teardown_gpio_mmap(void * ptr);` qui permet de supprimer la projection,
