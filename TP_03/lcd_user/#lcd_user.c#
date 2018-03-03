@@ -11,7 +11,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <asm/delay.h>
 
 /*******************************************************************************
  * GPIO Pins
@@ -28,12 +27,6 @@
 
 #define RPI_BLOCK_SIZE  0xB4
 #define RPI_GPIO_BASE   0x20200000
-
-
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Lee Fabre, 2018");
-MODULE_DESCRIPTION("Module, Module Lee Fabre 2018");
-
 
 struct gpio_s
 {
@@ -52,73 +45,48 @@ struct gpio_s
     uint32_t gppudclk[3];
     uint32_t test[1];
 };
-volatile struct gpio_s* (struct gpio_s *)__io_address(GPIO_BASE);
+volatile struct gpio_s* gpio_regs;
 
 /*******************************************************************************
  * GPIO Operations 
  ******************************************************************************/
 
-/** GPIO **/
+int gpio_setup ( void ){
 
-static void gpio_fsel(int pin, int fun)
-{
-    uint32_t reg = pin / 10;
-    uint32_t bit = (pin % 10) * 3;
-    uint32_t mask = 0b111 << bit;
-    gpio_regs->gpfsel[reg] = (gpio_regs->gpfsel[reg] & ~mask) | ((fun << bit) & mask);
+    int mmap_fd = open ("/dev/mem", O_RDWR | O_SYNC );
+    if ( mmap_fd < 0 ) {
+        return -1;
+    }
+
+    gpio_regs = mmap ( NULL, RPI_BLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, mmap_fd, RPI_GPIO_BASE );
+
+    if ( gpio_regs == MAP_FAILED ) {
+        close ( mmap_fd );
+        return -1;
+    }
+
+    return 0;
 }
 
-static void gpio_write(int pin, bool val)
+void  gpio_teardown ( void ){
+    munmap((void*)gpio_regs, RPI_BLOCK_SIZE);
+}
+
+
+void gpio_config(int gpio, int value)
 {
-    if (val)
-        gpio_regs->gpset[pin / 32] = (1 << (pin % 32));
+    gpio_regs->gpfsel[gpio/10] = ( gpio_regs->gpfsel[gpio/10] & ~(0x7 << ((gpio % 10) * 3)) )
+        | (value << ((gpio % 10) * 3));
+}
+
+void gpio_update(int gpio, int value)
+{
+    if( value )
+        gpio_regs->gpset[gpio/32] = (0x1 << (gpio % 32) );
     else
-        gpio_regs->gpclr[pin / 32] = (1 << (pin % 32));
+        gpio_regs->gpclr[gpio/32] = (0x1 << (gpio % 32) );
 }
 
-static int gpio_read(int pin)
-{
-    return (gpio_regs->gplev[pin/32] >> (pin % 32))  & 0x1;
-}
-
-/*
-   int gpio_setup ( void ){
-
-   int mmap_fd = open ("/dev/mem", O_RDWR | O_SYNC );
-   if ( mmap_fd < 0 ) {
-   return -1;
-   }
-
-   gpio_regs = mmap ( NULL, RPI_BLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, mmap_fd, RPI_GPIO_BASE );
-
-   if ( gpio_regs == MAP_FAILED ) {
-   close ( mmap_fd );
-   return -1;
-   }
-
-   return 0;
-   }
-
-
-   void  gpio_teardown ( void ){
-   munmap((void*)gpio_regs, RPI_BLOCK_SIZE);
-   }
-
-
-   void gpio_config(int gpio, int value)
-   {
-   gpio_regs->gpfsel[gpio/10] = ( gpio_regs->gpfsel[gpio/10] & ~(0x7 << ((gpio % 10) * 3)) )
-   | (value << ((gpio % 10) * 3));
-   }
-
-   void gpio_update(int gpio, int value)
-   {
-   if( value )
-   gpio_regs->gpset[gpio/32] = (0x1 << (gpio % 32) );
-   else
-   gpio_regs->gpclr[gpio/32] = (0x1 << (gpio % 32) );
-   }
-   */
 /*******************************************************************************
  * LCD's Instructions ( source = doc )
  ******************************************************************************/
@@ -204,9 +172,9 @@ void lcd_strobe(void)
 {
     gpio_config(E, 1);
     gpio_update(E, 1);
-    udelay(1);
+    usleep(1);
     gpio_update(E, 0);
-    udelay(1);
+    usleep(1);
 }
 
 /* send 4bits to LCD */
@@ -228,14 +196,14 @@ void lcd_write4bits(int data)
 
     lcd_strobe();
 
-    udelay(50); /* le délai minimum est de 37us */
+    usleep(50); /* le délai minimum est de 37us */
 }
 
 void lcd_command(int cmd)
 {
     gpio_update(RS, 0);
     lcd_write4bits(cmd);
-    udelay(2000); /* delai nécessaire pour certaines commandes */
+    usleep(2000); /* delai nécessaire pour certaines commandes */
 }
 
 void lcd_data(int character)
@@ -276,21 +244,13 @@ void lcd_set_cursor(int c, int l)
 void lcd_message(char* txt)
 {
     int i;
+    int j = 1;
 
     for(i=0; i<strlen(txt); i++){
 
         lcd_data(txt[i]);
-        if (i == 0x13) {
-            lcd_set_cursor(0, 1);
-        }
-        if (i == 0x53) {
-            lcd_set_cursor(0, 3);
-        }
-        if (i == 0x27) {
-            lcd_set_cursor(0, 2);
-        }
-        if (i == 0x67) {
-            lcd_set_cursor(0, 0);
+        if (i == j*0x13) {
+            lcd_set_cursor(0, j);
         }
     }
     lcd_set_cursor(0, 0);
@@ -300,171 +260,95 @@ void lcd_message(char* txt)
 /*******************************************************************************
  * Finally, the main function
  ******************************************************************************/
-
-/* int main(int argc, char** argv)*/
-/* {*/
-/*     [> arg <]*/
-/*     if( argc < 2 ){*/
-/*         fprintf(stderr, "ERROR: must take a string as argument\n");*/
-/*         exit(1);*/
-/*     }*/
-
-/*     [> Retreive the mapped GPIO memory <]*/
-/*     if( gpio_setup() == -1 ){*/
-/*         perror("ERROR: gpio_setup\n");*/
-/*         exit(1);*/
-/*     }*/
-
-/*     [> Setting up GPIOs to output <]*/
-/*     gpio_config(RS, GPIO_OUTPUT);*/
-/*     gpio_config(E , GPIO_OUTPUT);*/
-/*     gpio_config(D4, GPIO_OUTPUT);*/
-/*     gpio_config(D5, GPIO_OUTPUT);*/
-/*     gpio_config(D6, GPIO_OUTPUT);*/
-/*     gpio_config(D7, GPIO_OUTPUT);*/
-
-/*     [> initialization <]*/
-/*     lcd_init();*/
-/*     lcd_clear();*/
-
-/*     [> print app argument <]*/
-
-/*     // affichage sur chaque ligne du LCD le message*/
-/*     /*lcd_message(argv[1]);*/
-/*       lcd_set_cursor(0, 1);*/
-/*       lcd_message(argv[1]);*/
-/*       lcd_set_cursor(0, 2);*/
-/*       lcd_message(argv[1]);*/
-/*       lcd_set_cursor(0, 3);*/
-/*       lcd_message(argv[1]);*/*/
-
-/*     //lcd_message(argv[1]);*/
-
-/*     // lecture du fichier*/
-
-/*     int i;*/
-/*     int j = 0;*/
-
-
-/*     while(1){*/
-/*         //fseek(fd, 0, SEEK_SET);*/
-
-/*         FILE *fd = fopen("/proc/loadavg", "r");*/
-
-/*         if (fd == NULL) {*/
-/*             return -1;*/
-/*         }*/
-
-/*         i = 0;*/
-
-/*         char buf[25];*/
-/*         char res[256];*/
-
-/*         fscanf(fd, "%[^\n]s", buf);*/
-/*         printf("%s\n", buf);*/
-
-/*         char *p = strtok (buf, " ");*/
-/*         char *array[5];*/
-
-/*         while (p != NULL)*/
-/*         {*/
-/*             array[i++] = p;*/
-/*             p = strtok (NULL, " ");*/
-/*         }*/
-
-/*         for (i = 0; i < 5; ++i) */
-/*             printf("%s\n", array[i]);*/
-
-/*         char* tempo = strtok(array[3], "/");*/
-
-/*         /*sprintf(res, "Jobs:%s %s %s pro:%s ker:%s pid:%s", array[0],*/
-/*           array[1],*/
-/*           array[2],*/
-/*           tempo,*/
-/*           array[3],		*/
-/*           array[4]); */*/
-/*         sprintf(res, "LE TEXTE LE PLUS LONG DU MONDE heloo world je sui la ");*/
-
-/*         lcd_message(res);	*/
-/*         sleep(1);*/
-/*         fclose(fd);*/
-/*     }*/
-
-/*     [> Release the GPIO memory mapping <]*/
-/*     gpio_teardown();*/
-
-/*     return 0;*/
-/* }*/
-
-
-
-/* LCD OPERATIONS */
-static int 
-open_lcd(struct inode *inode, struct file *file) {
-
-    printk(KERN_DEBUG "open()\n");
-    return 0;
-}
-
-static ssize_t 
-read_lcd(struct file *file, char *buf, size_t count, loff_t *ppos) {
-
-    printk(KERN_DEBUG "read()\n");
-    return count;
-}
-
-static ssize_t 
-write_lcd(struct file *file, const char *buf, size_t count, loff_t *ppos) {
-
-    printk(KERN_DEBUG "write()\n");
-		lcd_message(buf);
-    return count;
-}
-
-static int 
-release_lcd(struct inode *inode, struct file *file) {
-
-    printk(KERN_DEBUG "close()\n");
-    return 0;
-}
-
-
-struct file_operations fops_ledbp =
+int main(int argc, char** argv)
 {
-    .open       = open_lcd,
-    .read       = read_lcd,
-    .write      = write_lcd,
-    .release    = release_lcd 
-};
+    /* arg */
+    if( argc < 2 ){
+        fprintf(stderr, "ERROR: must take a string as argument\n");
+        exit(1);
+    }
 
+    /* Retreive the mapped GPIO memory */
+    if( gpio_setup() == -1 ){
+        perror("ERROR: gpio_setup\n");
+        exit(1);
+    }
 
-static int __init mon_module_init(void)
-{
-/*     [> Setting up GPIOs to output <]*/
-   gpio_config(RS, GPIO_OUTPUT);
-  gpio_config(E , GPIO_OUTPUT);
+    /* Setting up GPIOs to output */
+    gpio_config(RS, GPIO_OUTPUT);
+    gpio_config(E , GPIO_OUTPUT);
     gpio_config(D4, GPIO_OUTPUT);
-     gpio_config(D5, GPIO_OUTPUT);
-     gpio_config(D6, GPIO_OUTPUT);
-     gpio_config(D7, GPIO_OUTPUT);
+    gpio_config(D5, GPIO_OUTPUT);
+    gpio_config(D6, GPIO_OUTPUT);
+    gpio_config(D7, GPIO_OUTPUT);
 
-/*     [> initialization <]*/
-     lcd_init();
-     lcd_clear();
+    /* initialization */
+    lcd_init();
+    lcd_clear();
+
+    /* print app argument */
+
+    // affichage sur chaque ligne du LCD le message
+    /*lcd_message(argv[1]);
+      lcd_set_cursor(0, 1);
+      lcd_message(argv[1]);
+      lcd_set_cursor(0, 2);
+      lcd_message(argv[1]);
+      lcd_set_cursor(0, 3);
+      lcd_message(argv[1]);*/
+
+    //lcd_message(argv[1]);
+
+    // lecture du fichier
+
+    int i, j;
+
+    while(1){
+
+        FILE *fd = fopen("/proc/loadavg", "r");
+
+        if (fd == NULL) {
+            return -1;
+        }
+
+        char buf[25];
+        float f1;
+        float f2;
+        float f3;
+        int i1;
+        char** tab = malloc(sizeof(char *));
+
+        for (i = 0; i < 5; ++i) {
+            tab[i] = malloc(sizeof(char)); 
+        }
+
+        fscanf(fd, "%[^\n]s", buf);
+
+        for (i = 0; i < strlen(buf); i++) {
+            j = 0; 
+            if ( j % 4 != 0)
+                tab[j++][i] = buf[i];
+        }
+
+        for (i = 0; i < 5; i++) {
+            fprintf(stderr,"%s\n", tab[i]); 
+        }
+
+        //fscanf(fd, "%lf %lf %lf %s %d", f1, f2, f3, buf, i1);
+        fprintf(stderr, "%s", buf); 
+        fflush(stderr);
+
+        lcd_message(buf);
+        fprintf(stderr,"Erreur sur l'ouverture du fichier1\n"); 
+        fflush(stderr);
+        sleep(1);
+        fprintf(stderr,"Erreur sur l'ouverture du fichier2\n"); 
+        fflush(stderr);
+        fclose(fd);
+    }
+
+    /* Release the GPIO memory mapping */
+    gpio_teardown();
+
+    return 0;
 }
-module_init(mon_module_init);
-
-static void __exit mon_module_cleanup(void)
-{
-
-}
-module_exit(mon_module_cleanup);
-
-
-
-
-
-
-
-
-

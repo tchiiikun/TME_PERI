@@ -34,11 +34,13 @@ struct gpio_s
 /** GLOBAL DEFINITIONS **/
 
 static int LED;
-static int BUT;
 module_param(LED, int, 0);
 MODULE_PARM_DESC(LED, "Nombre de led");
+
+static int BUT;
 module_param(BUT, int, 0);
 MODULE_PARM_DESC(BUT, "Nombre de button");
+
 static int major;
 
 

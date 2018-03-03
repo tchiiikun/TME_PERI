@@ -2,15 +2,12 @@
  * lcdr_user.c - Controleur pour LCd HD44780 ( 20x4 )
  ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/mman.h>
+
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <asm/io.h>
+#include <mach/platform.h>
 #include <asm/delay.h>
 
 /*******************************************************************************
@@ -29,7 +26,7 @@
 #define RPI_BLOCK_SIZE  0xB4
 #define RPI_GPIO_BASE   0x20200000
 
-
+static int major;
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Lee Fabre, 2018");
 MODULE_DESCRIPTION("Module, Module Lee Fabre 2018");
@@ -51,8 +48,7 @@ struct gpio_s
     uint32_t gppud[1];
     uint32_t gppudclk[3];
     uint32_t test[1];
-};
-volatile struct gpio_s* (struct gpio_s *)__io_address(GPIO_BASE);
+}*gpio_regs = (struct gpio_s *)__io_address(GPIO_BASE);
 
 /*******************************************************************************
  * GPIO Operations 
@@ -103,7 +99,7 @@ static int gpio_read(int pin)
    void  gpio_teardown ( void ){
    munmap((void*)gpio_regs, RPI_BLOCK_SIZE);
    }
-
+   */
 
    void gpio_config(int gpio, int value)
    {
@@ -118,7 +114,7 @@ static int gpio_read(int pin)
    else
    gpio_regs->gpclr[gpio/32] = (0x1 << (gpio % 32) );
    }
-   */
+
 /*******************************************************************************
  * LCD's Instructions ( source = doc )
  ******************************************************************************/
@@ -274,11 +270,12 @@ void lcd_set_cursor(int c, int l)
 }
 
 void lcd_message(char* txt)
-{
+{	
+	printk(txt);
     int i;
 
-    for(i=0; i<strlen(txt); i++){
-
+    for(i=0; i<strlen(txt) && txt[i] != '\n'; i++){
+		
         lcd_data(txt[i]);
         if (i == 0x13) {
             lcd_set_cursor(0, 1);
@@ -291,112 +288,12 @@ void lcd_message(char* txt)
         }
         if (i == 0x67) {
             lcd_set_cursor(0, 0);
+            lcd_clear();
         }
+
     }
     lcd_set_cursor(0, 0);
 }
-
-
-/*******************************************************************************
- * Finally, the main function
- ******************************************************************************/
-
-/* int main(int argc, char** argv)*/
-/* {*/
-/*     [> arg <]*/
-/*     if( argc < 2 ){*/
-/*         fprintf(stderr, "ERROR: must take a string as argument\n");*/
-/*         exit(1);*/
-/*     }*/
-
-/*     [> Retreive the mapped GPIO memory <]*/
-/*     if( gpio_setup() == -1 ){*/
-/*         perror("ERROR: gpio_setup\n");*/
-/*         exit(1);*/
-/*     }*/
-
-/*     [> Setting up GPIOs to output <]*/
-/*     gpio_config(RS, GPIO_OUTPUT);*/
-/*     gpio_config(E , GPIO_OUTPUT);*/
-/*     gpio_config(D4, GPIO_OUTPUT);*/
-/*     gpio_config(D5, GPIO_OUTPUT);*/
-/*     gpio_config(D6, GPIO_OUTPUT);*/
-/*     gpio_config(D7, GPIO_OUTPUT);*/
-
-/*     [> initialization <]*/
-/*     lcd_init();*/
-/*     lcd_clear();*/
-
-/*     [> print app argument <]*/
-
-/*     // affichage sur chaque ligne du LCD le message*/
-/*     /*lcd_message(argv[1]);*/
-/*       lcd_set_cursor(0, 1);*/
-/*       lcd_message(argv[1]);*/
-/*       lcd_set_cursor(0, 2);*/
-/*       lcd_message(argv[1]);*/
-/*       lcd_set_cursor(0, 3);*/
-/*       lcd_message(argv[1]);*/*/
-
-/*     //lcd_message(argv[1]);*/
-
-/*     // lecture du fichier*/
-
-/*     int i;*/
-/*     int j = 0;*/
-
-
-/*     while(1){*/
-/*         //fseek(fd, 0, SEEK_SET);*/
-
-/*         FILE *fd = fopen("/proc/loadavg", "r");*/
-
-/*         if (fd == NULL) {*/
-/*             return -1;*/
-/*         }*/
-
-/*         i = 0;*/
-
-/*         char buf[25];*/
-/*         char res[256];*/
-
-/*         fscanf(fd, "%[^\n]s", buf);*/
-/*         printf("%s\n", buf);*/
-
-/*         char *p = strtok (buf, " ");*/
-/*         char *array[5];*/
-
-/*         while (p != NULL)*/
-/*         {*/
-/*             array[i++] = p;*/
-/*             p = strtok (NULL, " ");*/
-/*         }*/
-
-/*         for (i = 0; i < 5; ++i) */
-/*             printf("%s\n", array[i]);*/
-
-/*         char* tempo = strtok(array[3], "/");*/
-
-/*         /*sprintf(res, "Jobs:%s %s %s pro:%s ker:%s pid:%s", array[0],*/
-/*           array[1],*/
-/*           array[2],*/
-/*           tempo,*/
-/*           array[3],		*/
-/*           array[4]); */*/
-/*         sprintf(res, "LE TEXTE LE PLUS LONG DU MONDE heloo world je sui la ");*/
-
-/*         lcd_message(res);	*/
-/*         sleep(1);*/
-/*         fclose(fd);*/
-/*     }*/
-
-/*     [> Release the GPIO memory mapping <]*/
-/*     gpio_teardown();*/
-
-/*     return 0;*/
-/* }*/
-
-
 
 /* LCD OPERATIONS */
 static int 
@@ -415,9 +312,9 @@ read_lcd(struct file *file, char *buf, size_t count, loff_t *ppos) {
 
 static ssize_t 
 write_lcd(struct file *file, const char *buf, size_t count, loff_t *ppos) {
-
+	lcd_clear();
     printk(KERN_DEBUG "write()\n");
-		lcd_message(buf);
+	lcd_message(buf);
     return count;
 }
 
@@ -429,7 +326,7 @@ release_lcd(struct inode *inode, struct file *file) {
 }
 
 
-struct file_operations fops_ledbp =
+struct file_operations fops_lcd =
 {
     .open       = open_lcd,
     .read       = read_lcd,
@@ -440,23 +337,25 @@ struct file_operations fops_ledbp =
 
 static int __init mon_module_init(void)
 {
-/*     [> Setting up GPIOs to output <]*/
-   gpio_config(RS, GPIO_OUTPUT);
-  gpio_config(E , GPIO_OUTPUT);
-    gpio_config(D4, GPIO_OUTPUT);
-     gpio_config(D5, GPIO_OUTPUT);
-     gpio_config(D6, GPIO_OUTPUT);
-     gpio_config(D7, GPIO_OUTPUT);
+		/*     [> Setting up GPIOs to output <]*/
+		gpio_config(RS, GPIO_OUTPUT);
+		gpio_config(E , GPIO_OUTPUT);
+		gpio_config(D4, GPIO_OUTPUT);
+		gpio_config(D5, GPIO_OUTPUT);
+		gpio_config(D6, GPIO_OUTPUT);
+		gpio_config(D7, GPIO_OUTPUT);
 
-/*     [> initialization <]*/
-     lcd_init();
-     lcd_clear();
+		/*     [> initialization <]*/
+		lcd_init();
+		lcd_clear();
+		major = register_chrdev(0, "lcd_user", &fops_lcd); // 0 est le numéro majeur qu'on laisse choisir par linux
+		return 0;
 }
 module_init(mon_module_init);
 
 static void __exit mon_module_cleanup(void)
 {
-
+ unregister_chrdev(major, "lcd_user");
 }
 module_exit(mon_module_cleanup);
 
