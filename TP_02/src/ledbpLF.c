@@ -8,9 +8,6 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Lee Fabre, 2018");
 MODULE_DESCRIPTION("Module, BLABLABLABLABLA");
 
-static const int LED0 = 4;
-static const int BTN0 = 18;
-
 struct gpio_s
 {
     uint32_t gpfsel[7];
@@ -33,29 +30,30 @@ struct gpio_s
 
 /** GLOBAL DEFINITIONS **/
 
-static int LED;
+static int LED = 2;
 module_param(LED, int, 0);
 MODULE_PARM_DESC(LED, "Nombre de led");
 
-static int BUT;
+static int BUT = 1;
 module_param(BUT, int, 0);
 MODULE_PARM_DESC(BUT, "Nombre de button");
 
+static const int led0[2] = {4, 17};
+static const int but0[1] = {18};
+
 static int major;
-
-
 
 /** GPIO **/
 
-static void gpio_fsel(int pin, int fun)
-{
-    uint32_t reg = pin / 10;
-    uint32_t bit = (pin % 10) * 3;
-    uint32_t mask = 0b111 << bit;
-    gpio_regs->gpfsel[reg] = (gpio_regs->gpfsel[reg] & ~mask) | ((fun << bit) & mask);
-}
+//~ static void gpio_fsel(int pin, int fun)
+//~ {
+    //~ uint32_t reg = pin / 10;
+    //~ uint32_t bit = (pin % 10) * 3;
+    //~ uint32_t mask = 0b111 << bit;
+    //~ gpio_regs->gpfsel[reg] = (gpio_regs->gpfsel[reg] & ~mask) | ((fun << bit) & mask);
+//~ }
 
-static void gpio_write(int pin, bool val)
+static void gpio_write(int pin, int val)
 {
     if (val)
         gpio_regs->gpset[pin / 32] = (1 << (pin % 32));
@@ -65,10 +63,8 @@ static void gpio_write(int pin, bool val)
 
 static int gpio_read(int pin)
 {
-  return (gpio_regs->gplev[pin/32] >> (pin % 32))  & 0x1;
+	return (gpio_regs->gplev[pin/32] >> (pin % 32)) & 0x1;
 }
-
-
 
 /** LEDBP **/
 
@@ -80,15 +76,28 @@ open_ledbp(struct inode *inode, struct file *file) {
 
 static ssize_t 
 read_ledbp(struct file *file, char *buf, size_t count, loff_t *ppos) {
-    gpio_read(BTN0);
-    printk(KERN_DEBUG "read()\n");
+    
+    int i;
+    for (i = 0; i < 1; i++) {
+		int nb = gpio_read(but0[i]);
+		(nb == 0) ? (*(buf+i) = '1') : (*(buf+i) = '0');
+		 printk(KERN_DEBUG "read() %c\n", *(buf+i)) ;
+    }
+ 
     return count;
 }
 
 static ssize_t 
 write_ledbp(struct file *file, const char *buf, size_t count, loff_t *ppos) {
-    gpio_write(LED0, 1);
-    printk(KERN_DEBUG "write()\n");
+	int val;
+    int i;
+    
+    for (i = 0; i < 2; i++) {
+		(*(buf+i) == '1') ? (val = 1) : (val = 0);
+		gpio_write(led0[i], val);
+		 printk(KERN_DEBUG "write() %c\n", *(buf+i));
+    }
+ 
     return count;
 }
 
@@ -106,7 +115,6 @@ struct file_operations fops_ledbp =
     .release    = release_ledbp 
 };
 
-
 static int __init mon_module_init(void)
 {
     printk(KERN_DEBUG "Hello World TOTO!\n");
@@ -122,9 +130,6 @@ static void __exit mon_module_cleanup(void)
    printk(KERN_DEBUG "Goodbye World TOTO!\n");
    unregister_chrdev(major, "ledbp");
 }
-
-
-
 
 module_init(mon_module_init);
 module_exit(mon_module_cleanup);
