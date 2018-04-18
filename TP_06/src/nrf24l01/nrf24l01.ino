@@ -26,7 +26,7 @@ unsigned int waitFor(int timer, unsigned long period){
 struct Mess_st {
   int timer;                                              // numéro de timer utilisé par WaitFor
   unsigned long period;                                             // periode d'affichage
-  char mess[20];
+  char mess[32];
 } Mess_t ; 
 
 void setup_Mess(struct Mess_st * ctx, int timer, unsigned long period, const char * mess) {
@@ -41,15 +41,14 @@ void setup_Mess(struct Mess_st * ctx, int timer, unsigned long period, const cha
   Serial.begin(9600);                                     // initialisation du débit de la liaison série
 }
 
-void loop_Mess(struct Mess_st *ctx, const char * mess) {
+void loop_Mess(struct Mess_st *ctx) {
   if (!(waitFor(ctx->timer,ctx->period))) return;         // sort s'il y a moins d'une période écoulée
 
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(0,0);
-  display.println(mess);
+  display.println(ctx->mess);
   display.display();
-  delay(2000);
   display.clearDisplay();
 }
 
@@ -76,6 +75,7 @@ void loop() {
   if( radio.available()){
     radio.read( buffer, sizeof(buffer) );             // Get the payload
     Serial.println(buffer);
-    loop_Mess(&msg, buffer);
+    strcpy(ctx->mess, buffer);
+    loop_Mess(&msg);
    }
 }
