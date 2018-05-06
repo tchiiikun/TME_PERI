@@ -1,0 +1,77 @@
+=====================
+=== test_filterNR ===
+=====================
+----------------
+--- test_fir ---
+----------------
+sigma noise = 10.0
+X1_GN_10.txt -> PSNR =    25.31 db
+radius = 1
+F32(r=1) PSNR =  37.03 db 
+I16(r=1) PSNR =  36.20 db
+Q8(r=1) PSNR =  36.60 db
+Q10(r=1) PSNR =  36.36 db
+G(s=1.4) PSNR =  43.08 db
+
+
+=====================
+=== test_filterNR ===
+=====================
+----------------
+--- test_fir ---
+----------------
+sigma noise = 10.0
+X1_GN_10.txt -> PSNR =    25.31 db
+radius = 2
+F32(r=2) PSNR =  42.37 db
+I16(r=2) PSNR =  42.28 db
+Q8(r=2) PSNR =  42.61 db
+Q10(r=2) PSNR =  42.61 db
+G(s=1.4) PSNR =  43.08 db
+
+
+=====================
+=== test_filterNR ===
+=====================
+----------------
+--- test_fir ---
+----------------
+sigma noise = 10.0
+X1_GN_10.txt -> PSNR =    25.31 db
+radius = 3
+F32(r=3) PSNR =  49.46 db
+I16(r=3) PSNR =  47.92 db
+Q8(r=3) PSNR =  42.55 db
+Q10(r=3) PSNR =  47.04 db
+G(s=1.4) PSNR =  43.08 db
+
+=====================
+=== test_filterNR ===
+=====================
+----------------
+--- test_fir ---
+----------------
+sigma noise = 10.0
+X1_GN_10.txt -> PSNR =    25.31 db
+radius = 10
+F32(r=10) PSNR =  57.59 db
+I16(r=10) PSNR =  52.82 db
+Q8(r=10) PSNR =  39.47 db
+Q10(r=10) PSNR =  39.47 db
+G(s=1.4) PSNR =  43.08 db
+
+=====================
+=== test_filterNR ===
+=====================
+----------------
+--- test_fir ---
+----------------
+sigma noise = 10.0
+X1_GN_10.txt -> PSNR =    25.31 db
+radius = 20
+F32(r=20) PSNR =  41.83 db
+I16(r=20) PSNR =  38.49 db
+Q8(r=20) PSNR =  27.29 db
+Q10(r=20) PSNR =  27.29 db
+G(s=1.4) PSNR =  43.08 db
+

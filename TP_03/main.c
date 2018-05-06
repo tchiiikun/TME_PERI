@@ -16,7 +16,7 @@ int main() {
 	// affichage du Hello World
 	lcl_init(); // initialisation du LCD
 
-	lcd_message(tab); // affichage		
+	lcd_message(tab); // affichage
 
 	lcl_clear(); // fermeture
 }

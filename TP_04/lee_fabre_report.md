@@ -1,41 +1,38 @@
-# TP$ : Serveur WEB minimaliste pour la commande des LEDs et la lecture du bouton poussoir.
+# TP4 : Serveur WEB minimaliste pour la commande des LEDs et la lecture du bouton poussoir.
 
+ * browser web :
+ * serveur web :
+ * requete client :
+ * CGI (Common Gateway Interface) :
+ * HTML :
+ * 
 
-## Communication par FIFO
+## 1. Communication par FIFO
+### writer.py
+#### Dans quel répertoire est créée la fifo ?
+Dans /tmp/
 
-### Dans quel répertoire est créée la fifo ?
-Dans le repertoire /tmp pour des dossiers temporaires.
+#### Quelle différence mkfifo et open ?
+Creation d'une fifo dans un fichier a partir d'un nom et ouverture d'un fichier
+dans le system de fichier.
 
-### Quelle difference mkfifo et open?
-mkfifo cree un fichier et le defini comme une fifo et open cree une ouverture de fichier dans le systeme file system.
+#### Pourquoi tester que la fifo existe ?
+La creation a pu rater.
 
-### Pourquoi tester que la FIFO existe?
-Car il peut y avoir une erreur a la creation si on a deja cree une fifo ou un
-fichier aillant le meme nom.
+#### À quoi sert flush ?
+Forcer l'ecriture du buffer car print d'ecrit pas vraiment et va d'abord
+stocker dans un buffer si on a pas de \n a la fin.
 
-### A quoi sert flush?
-A forcer le programme a ecrire car la fonction write fait une ecriture qui est
-buffurise par le systeme.
+#### Pourquoi ne ferme-t-on pas la fifo ?
+Si on ferme la FIFO alors le programme C ne pourra ecrire dedans.
 
-### Pourquoi ne ferme-t-on pas la FIFO?
-Car on va l'utiliser avec un systeme client-serveur
+### reader.py
 
-### Que fait readline?
-La fonction readline() va lire une ligne jusqu'a \n dans le fifo.
+#### Que fait readline ?
+Lis une ligne jusqu'a la fin de l'argument size ou jusqu'a un \n
 
-### Expliquez le phenomene?
-Dans un producteur consommateur si tout le monde produit mais personne ne
-consomme, il ne se passe rien.
+###  Vous allez remarquer que lorsque le vous lancer un écrivain (en C ou en Pyhton) rien ne se passe tant que vous n'avez pas lancé un lecteur. Expliquez le phénomène.
+Si on ecrit sans qu'il n'y ait de lecteur alors on tombe dans le vide.
 
-## Creation d'un fake serveur
-// TODO recopier le code et expliquer pourquoi il faut utiliser readline avec
-// \n et pourquoi il faut utiliser read(nb char)
-
-## Creation d'un serveur web 
-
-###
-
-
-
-
-
+## 2. Création d'un serveur fake
+## 3. Création d'un serveur web
