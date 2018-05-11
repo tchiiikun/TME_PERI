@@ -373,7 +373,7 @@ void iir_q16(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     sint16 A1 = lroundf(a1 * Q);
     sint16 A2 = lroundf(a2 * Q);
     
-    /* printf("H(k) = %d \n", B0+A1+A2);*/
+    printf("H(k) = %d \n", B0+A1+A2);
     
     y1 = y2 = X[0];
     
@@ -417,7 +417,7 @@ void iir_q32(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     
     sint32 X0, Y0, Y1, Y2; 
     
-    /* printf("H(k) = %d \n", B0+A1+A2);*/
+    printf("H(k) = %d \n", B0+A1+A2);
     
     y1 = y2 = X[0];
     Y1 = y1 * Q;
