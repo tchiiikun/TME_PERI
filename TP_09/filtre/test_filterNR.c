@@ -115,7 +115,12 @@ void test_generate_sample(void)
 	free_ui8vector(X, 0, size-1);
 }
 // --------------------------------------------------------------------------------
-void routine_linear_filter(int size, int amplitude, char *filename, char *dst_path)
+void routine_linear_filter(int size, int amplitude,
+		char *filename, char *dst_path,
+		float32 alpha,
+		float32 sigma_noise,
+		float32 sigma_gauss,
+		int radius, int q)
 	// --------------------------------------------------------------------------------
 {
 	char complete_filename[FILENAME_SIZE];
@@ -126,11 +131,11 @@ void routine_linear_filter(int size, int amplitude, char *filename, char *dst_pa
 	int ndigit;
 
 	//int k;
-	float32 alpha;
-	float32 sigma_noise; // ecart type du bruit
-	float32 sigma_gauss; // ecart type du filtre gaussien
-	int radius;
-	int q;
+	/* float32 alpha;*/
+	/* float32 sigma_noise; // ecart type du bruit -> A VARIER*/
+	/* float32 sigma_gauss; // ecart type du filtre gaussien -> A VARIER*/
+	/* int radius; // -> A VARIER*/
+	/* int q; // designe la precision -> A VARIER*/
 	//int radius_gauss;
 
 	uint8 *X0; // tableau d'echantillons sans bruit
@@ -160,15 +165,15 @@ void routine_linear_filter(int size, int amplitude, char *filename, char *dst_pa
 	// --------------------
 
 	sep = "_GN_";
-	sigma_noise = 5;
-	sigma_noise = 10; // bruit varier
+	/* sigma_noise = 5;*/
+	/* sigma_noise = 10; // bruit varier*/
 
 	ndigit = 2;
-	printf("sigma noise = %3.1f\n", sigma_noise);
+	/* printf("sigma noise = %3.1f\n", sigma_noise);*/
 	gaussian_noise_ui8vector(X0, 0, size-1, (float32) sigma_noise, X);
 	psnr = psnr_ui8vector(X0, 0, size-1, X);
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
-	printf("%s -> PSNR = %8.2f db\n", complete_filename, psnr);
+	/* printf("%s -> PSNR = %8.2f db\n", complete_filename, psnr);*/
 	write_ui8vector(X, 0, size-1, format, complete_filename);
 
 	//goto IIR;
@@ -177,13 +182,14 @@ void routine_linear_filter(int size, int amplitude, char *filename, char *dst_pa
 	// -- filtre moyenneur --
 	// ----------------------
 FIR:
-	radius = 20; // <- parametre a faire varier
-	printf("radius = %d\n", radius);
+	/* radius = 20; // <- parametre a faire varier*/
+	/* printf("radius = %d\n", radius);*/
 
 	// -- calcul flottant
 	fir_average_f32(X, size, radius, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
-	printf("F32(r=%d) PSNR = %6.2f db\n", radius, psnr);
+	/* printf("F32(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
+	printf("%6.2f ", radius, psnr);
 	sep = "_F32_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -191,7 +197,8 @@ FIR:
 	// -- calcul entier avec division
 	fir_average_i16(X, size, radius, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
-	printf("I16(r=%d) PSNR = %6.2f db\n", radius, psnr);
+	/* printf("I16(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
+	printf("%6.2f ", radius, psnr);
 	sep = "_I16_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -199,7 +206,8 @@ FIR:
 	// -- calcul entier avec fraction equivalente en Q8
 	fir_average_q16(X, size, radius, 8, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
-	printf("Q8(r=%d) PSNR = %6.2f db\n", radius, psnr);
+	/* printf("Q8(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
+	printf("%6.2f ", radius, psnr);
 	sep = "_Q8_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -207,7 +215,8 @@ FIR:
 	// -- calcul entier avec fraction equivalente en Q10
 	fir_average_q16(X, size, radius, 10, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);  // sur 10 bits
-	printf("Q10(r=%d) PSNR = %6.2f db\n", radius, psnr);
+	/* printf("Q10(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
+	printf("%6.2f ", radius, psnr);
 	sep = "_Q10_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -218,12 +227,13 @@ FIR:
 
 	ndigit = 2; // codage sur 2 chiffre de la valeur de sigma dans le nom du fichier
 
-	sigma_gauss = 0.5f; // <- parametre a faire varier
-	sigma_gauss = 1.0f;
-	sigma_gauss = 1.4f;
+	/* sigma_gauss = 0.5f; // <- parametre a faire varier*/
+	/* sigma_gauss = 1.0f;*/
+	/* sigma_gauss = 1.4f;*/
 	fir_gauss_f32(X, size, sigma_gauss, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
-	printf("G(s=%.1f) PSNR = %6.2f db\n", sigma_gauss, psnr);
+	/* printf("G(s=%.1f) PSNR = %6.2f db\n", sigma_gauss, psnr);*/
+	printf("%6.2f ", sigma_gauss, psnr);
 	sep = "_G_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, 10*sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -234,30 +244,33 @@ FIR:
 	// ---------------------
 IIR:
 
-	alpha = 0.8;  // alpha [0.5 : 1.0] = lissage fort / lissage faible
-	alpha = 0.6;
-	alpha = 0.4;
+	/* alpha = 0.8;  // alpha [0.5 : 1.0] = lissage fort / lissage faible*/
+	/* alpha = 0.6;*/
+	/* alpha = 0.4;*/
 	iir_f32(X, size, alpha, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
-	printf("IIR(alpha=%.1f) PSNR = %6.2f db\n", alpha, psnr);
+	/* printf("IIR(alpha=%.1f) PSNR = %6.2f db\n", alpha, psnr);*/
+	printf("%6.2f ", alpha, psnr);
 	sep = "_IIRF_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
 
 	// -- calcul en Q
-	q = 8;
+	/* q = 8;*/
 	iir_q16(X, size, alpha, 8, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
-	printf("IIR(alpha=%.1f,q=%d) PSNR = %6.2f db\n", alpha, q, psnr);
+	/* printf("IIR(alpha=%.1f,q=%d) PSNR = %6.2f db\n", alpha, q, psnr);*/
+	printf("%6.2f ", alpha, q, psnr);
 	sep = "_IIRI16_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
 
 	// -- calcul en Q
-	q = 8;
+	/* q = 8;*/
 	iir_q32(X, size, alpha, 8, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
-	printf("IIR(alpha=%.1f,q=%d) PSNR = %6.2f db\n", alpha, q, psnr);
+	/* printf("IIR(alpha=%.1f,q=%d) PSNR = %6.2f db\n", alpha, q, psnr);*/
+	printf("%6.2f \n", alpha, q, psnr);
 	sep = "_IIRQ32_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -284,8 +297,54 @@ void test_linear_filter(void)
 	puts("----------------");
 
 	// smooth filter for gaussian noise
-	filename = "X1"; routine_linear_filter(size, amplitude, filename, dst_path);
+	filename = "X1";
+
+	float32 sigma_noise;
+	float32 sigma_gauss;
+	float32 alpha;
+	int radius;
+	int q;
+	int i = 0;
+
+/* 1) fir average 32*/
+/* 2) fir average i16*/
+/* 3) fir average q16 Q8*/
+/* 4) fir average q16 Q10*/
+/* 5) fir_gauss_f32*/
+/* 6) iir_f32*/
+/* 7) iir_q16*/
+/* 8) iir_q32*/
+
+	printf("FA32    ");
+	printf("FA16    ");
+	printf("Fi8    ");
+	printf("Fi16   ");
+	printf("FG     ");
+	printf("iirf   ");
+	printf("irq1   ");
+	printf("irq3    \n");
+
+	for (sigma_noise = 5; sigma_noise < 20; sigma_noise+=4) {
+		for (sigma_gauss = 0.5f; sigma_gauss < 2.5f; sigma_gauss+=0.5f) {
+			for (q = 8; q < 32; q+=8) {
+				for (radius = 5; radius < 25; radius+=5) {
+					for (alpha = 0.2f; alpha < 1.0f; alpha+=0.2f) {
+						routine_linear_filter(size,
+								amplitude,
+								filename,
+								dst_path,
+								alpha,
+								sigma_noise,
+								sigma_gauss,
+								radius,
+								q);
+					}
+				}
+			}
+		}
+	}
 }
+
 // ----------------
 void test_iir(void)
 	// ----------------
@@ -352,6 +411,7 @@ void test_median_filter(void)
 /* ------------------------------------------ */
 int test_filterNR(int argc, const char * argv[])
 	/* ------------------------------------------ */
+
 {
 	puts("=====================");
 	puts("=== test_filterNR ===");

@@ -39,3 +39,4 @@ test_filterNR.o: test_filterNR.c $(HEADER)
 clean:
 	rm -f $(OBJ)
 	rm -f tp
+	rm *.txt
