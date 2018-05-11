@@ -267,7 +267,7 @@ void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)
        
     d = 2*radius+1;
     
-		uint16 lambda = (1 << q) / d;
+	uint16 lambda = (1 << q) / d;
         
     // allocation et copie dans un tableau temporaire avec bords
     T = ui8vector(0-radius, n-1+radius);
@@ -279,9 +279,9 @@ void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)
         for(di = -radius; di <= radius; di++) {
             s += T[i+di];
         }
-				y = (s * lambda + (1 << (q-1))) >> q;
-				    Y[i] = (uint8) y;
-				}
+		y = (s * lambda + (1 << (q-1))) >> q;
+			Y[i] = (uint8) y;
+		}
     
     free_ui8vector(T, 0-radius, n-1+radius);
 }
@@ -333,7 +333,6 @@ void iir_f32(uint8 *X, int n, float32 alpha, uint8 *Y)
     y1 = y2 = X[0];
     
     for(i = 0; i < n; i++) {
-        
         x0 = X[i];
         y0 = b0 * x0 + a1 * y1 + a2 * y2;
         
@@ -373,7 +372,6 @@ void iir_q16(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     y1 = y2 = X[0];
     
     for(i = 0; i < n; i++) {
-        
         x0 = X[i];
         y0 = ((B0 * x0 + A1 * y1 + A2 * y2) + (1 << (q-1))) >> q;
 
@@ -416,12 +414,11 @@ void iir_q32(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     Y2 = y2 * Q;
     
     for(i = 0; i < n; i++) {
-        
         x0 = X[i];
         X0 = x0 * Q;
         
         Y0 = ((B0 * X0 + A1 * Y1 + A2 * Y2) + 2*(1 << (q-1))) >> q;	
-				y0 = Y0 >> q;
+		y0 = Y0 >> q;
 
         if(y0 <   0) y0 =   0;
         if(y0 > 255) y0 = 255;
