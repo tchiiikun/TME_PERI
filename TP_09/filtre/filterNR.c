@@ -429,7 +429,7 @@ void iir_q32(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
         X0 = x0 * Q;
         
         Y0 = ((B0 * X0 + A1 * Y1 + A2 * Y2) + 2*(1 << (q-1))) >> q;	
-		y0 = Y0 >> q;
+	y0 = Y0 >> q;
 
         if(y0 <   0) y0 =   0;
         if(y0 > 255) y0 = 255;

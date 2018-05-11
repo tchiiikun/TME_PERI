@@ -189,7 +189,7 @@ FIR:
 	fir_average_f32(X, size, radius, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
 	/* printf("F32(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
-	printf("%6.2f ", radius, psnr);
+	printf("%6.2f ", psnr);
 	sep = "_F32_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -198,7 +198,7 @@ FIR:
 	fir_average_i16(X, size, radius, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
 	/* printf("I16(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
-	printf("%6.2f ", radius, psnr);
+	printf("%6.2f ", psnr);
 	sep = "_I16_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -207,7 +207,7 @@ FIR:
 	fir_average_q16(X, size, radius, 8, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
 	/* printf("Q8(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
-	printf("%6.2f ", radius, psnr);
+	printf("%6.2f ", psnr);
 	sep = "_Q8_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -216,7 +216,7 @@ FIR:
 	fir_average_q16(X, size, radius, 10, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);  // sur 10 bits
 	/* printf("Q10(r=%d) PSNR = %6.2f db\n", radius, psnr);*/
-	printf("%6.2f ", radius, psnr);
+	printf("%6.2f ", psnr);
 	sep = "_Q10_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -233,7 +233,7 @@ FIR:
 	fir_gauss_f32(X, size, sigma_gauss, Y);
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
 	/* printf("G(s=%.1f) PSNR = %6.2f db\n", sigma_gauss, psnr);*/
-	printf("%6.2f ", sigma_gauss, psnr);
+	printf("%6.2f ", psnr);
 	sep = "_G_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, 10*sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -250,7 +250,7 @@ IIR:
 	iir_f32(X, size, alpha, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
 	/* printf("IIR(alpha=%.1f) PSNR = %6.2f db\n", alpha, psnr);*/
-	printf("%6.2f ", alpha, psnr);
+	printf("%6.2f ", psnr);
 	sep = "_IIRF_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -260,7 +260,7 @@ IIR:
 	iir_q16(X, size, alpha, 8, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
 	/* printf("IIR(alpha=%.1f,q=%d) PSNR = %6.2f db\n", alpha, q, psnr);*/
-	printf("%6.2f ", alpha, q, psnr);
+	printf("%6.2f ", psnr);
 	sep = "_IIRI16_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
@@ -270,7 +270,7 @@ IIR:
 	iir_q32(X, size, alpha, 8, Y); // sur 8 bits
 	psnr = psnr_ui8vector(X0, 0, size-1, Y);
 	/* printf("IIR(alpha=%.1f,q=%d) PSNR = %6.2f db\n", alpha, q, psnr);*/
-	printf("%6.2f \n", alpha, q, psnr);
+	printf("%6.2f \n", psnr);
 	sep = "_IIRQ32_";
 	generate_path_filename_sep_k_ndigit_extension(dst_path, filename, sep, sigma_noise, ndigit, ext, complete_filename);
 	write_ui8vector(Y, 0, size-1, format, complete_filename);
