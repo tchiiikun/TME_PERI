@@ -222,7 +222,6 @@ void fir_average_f32(uint8 *X, int n, int radius, uint8 *Y)
             s += T[i+di];
         }
         y = s / d;
-        //~ printf("s = %f y = %f\n", s, y);
         Y[i] = (uint8) lroundf(y);
     }
     
@@ -251,7 +250,6 @@ void fir_average_i16(uint8 *X, int n, int radius, uint8 *Y)
             s += T[i+di];
         }
         y = (s+d/2) / d;
-        //~ printf("s = %d y = %d\n", s, y);
         Y[i] = (uint8) y;
     }
     
@@ -269,7 +267,7 @@ void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)
        
     d = 2*radius+1;
     
-	uint16 lambda = (1 << q) / d;
+		uint16 lambda = (1 << q) / d;
         
     // allocation et copie dans un tableau temporaire avec bords
     T = ui8vector(0-radius, n-1+radius);
@@ -281,10 +279,9 @@ void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)
         for(di = -radius; di <= radius; di++) {
             s += T[i+di];
         }
-   
-		y = (s*lambda) >> q;
-        Y[i] = (uint8) y;
-    }
+				y = (s * lambda + (1 << (q-1))) >> q;
+				    Y[i] = (uint8) y;
+				}
     
     free_ui8vector(T, 0-radius, n-1+radius);
 }
@@ -424,7 +421,7 @@ void iir_q32(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
         X0 = x0 * Q;
         
         Y0 = ((B0 * X0 + A1 * Y1 + A2 * Y2) + 2*(1 << (q-1))) >> q;	
-	y0 = Y0 >> q;
+				y0 = Y0 >> q;
 
         if(y0 <   0) y0 =   0;
         if(y0 > 255) y0 = 255;
