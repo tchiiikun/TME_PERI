@@ -280,8 +280,8 @@ void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)
             s += T[i+di];
         }
 		y = (s * lambda + (1 << (q-1))) >> q;
-			Y[i] = (uint8) y;
-		}
+	    Y[i] = (uint8) y;
+	}
     
     free_ui8vector(T, 0-radius, n-1+radius);
 }
