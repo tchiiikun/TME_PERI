@@ -11,7 +11,7 @@ int main()
 {
 	int		err;
 	int		fd;
-	char    *myfifo = "/tmp/myfifo_LF";
+	char    *myfifo = "/tmp/myfifo";
 	char	buf[MAX_BUF];
 
 	/* open, read, and display the message from the FIFO */
