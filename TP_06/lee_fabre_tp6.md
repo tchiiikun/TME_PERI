@@ -320,6 +320,6 @@ Nous avons regroupé les 3 fonctions dans un seul fichier :
 	   }
 	}
  
-Pour ce module, nous avons les fonctions `setup_Mess()' et `loop_Mess` pour afficher un message sur le OLED.
+Pour ce module, nous avons les fonctions `setup_Mess()` et `loop_Mess` pour afficher un message sur le OLED.
 
 Si la radio est disponible, la lecture sur le radio s'effectue et le message est écrit sur le OLED.
