@@ -89,6 +89,7 @@ read_ledbp(struct file *file, char *buf, size_t count, loff_t *ppos) {
 
 static ssize_t 
 write_ledbp(struct file *file, const char *buf, size_t count, loff_t *ppos) {
+
 	int val;
 	int i;
 
