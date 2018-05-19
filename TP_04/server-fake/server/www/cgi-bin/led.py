@@ -11,7 +11,8 @@ val = form.getvalue('val')
 
 s2f.write("w %s\n" % val)
 s2f.flush()
-# res = f2s.readline()
+res = f2s.readline()
+sys.stdout.write(res)
 f2s.close()
 s2f.close()
 

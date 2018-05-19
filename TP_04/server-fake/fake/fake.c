@@ -80,6 +80,7 @@ int server(int fd_in, int fd_out, char *bp2f2s, char *s2f2led)
 			nbchar_fd_in = read(fd_in, bp2f2s, MAXServerResquest);
 			if (bp2f2s[0] == '1')
 				bool_fd_in_prec = 1;
+			write(f2s, bp2f2s, nbchar_fd_in);
 			bool_fd_in = 0;
 		}
 
@@ -92,7 +93,6 @@ int server(int fd_in, int fd_out, char *bp2f2s, char *s2f2led)
 				break;
 			s2f2led[nbchar_s2f] = 0;
 			write(fd_out, s2f2led, nbchar_s2f);
-			write(f2s, bp2f2s, nbchar_fd_in);
 			bool_s2f = bool_fd_in = bool_fd_in_prec = 0;
 		}
 	} while (1);
