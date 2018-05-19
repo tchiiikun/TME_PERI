@@ -20,14 +20,14 @@ int main()
 {
 	int fd_in, fd_out;
 
-	fd_out = fd_in = open("/dev/ledbpLF", O_RDWR);
-	if (fd_in < 0) {
-		fprintf(stderr, "Erreur d'ouverture du pilote LED et Boutons\n");
-		exit(1);
-	}
+	/* fd_out = fd_in = open("/dev/ledbpLF", O_RDWR);*/
+	/* if (fd_in < 0) {*/
+	/*         fprintf(stderr, "Erreur d'ouverture du pilote LED et Boutons\n");*/
+	/*         exit(1);*/
+	/* }*/
 
-	/* fd_in = 0;*/
-	/* fd_out = 1;*/
+	fd_in = 0;
+	fd_out = 1;
 	server(fd_in, fd_out, bp, led);
 	return 0;
 }
@@ -78,7 +78,8 @@ int server(int fd_in, int fd_out, char *bp2f2s, char *s2f2led)
 		/* check if this turn there is something */
 		if (bool_fd_in){
 			nbchar_fd_in = read(fd_in, bp2f2s, MAXServerResquest);
-			bool_fd_in_prec = 1;
+			if (bp2f2s[0] == '1')
+				bool_fd_in_prec = 1;
 			bool_fd_in = 0;
 		}
 

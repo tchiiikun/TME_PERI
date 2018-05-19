@@ -1,4 +1,4 @@
-CARD_NUMB       = 22
+CARD_NUMB       = 23
 ROUTER          = 132.227.102.36
 LOGIN           = lee-fabre
 LAB             = lab3
