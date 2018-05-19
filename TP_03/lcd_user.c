@@ -11,7 +11,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <asm/delay.h>
+#include <unistd.h>
+/* #include <asm/delay.h>*/
+/* #include <asm/delay.h>*/
 
 /*******************************************************************************
  * GPIO Pins
@@ -177,9 +179,9 @@ void lcd_strobe(void)
 {
 	/* gpio_config(E, 1);*/
 	gpio_update(E, 1);
-	udelay(1);
+	usleep(1);
 	gpio_update(E, 0);
-	udelay(1);
+	usleep(1);
 }
 
 /* send 4bits to LCD */
@@ -201,14 +203,14 @@ void lcd_write4bits(int data)
 
 	lcd_strobe();
 
-	udelay(50); /* le délai minimum est de 37us */
+	usleep(50); /* le délai minimum est de 37us */
 }
 
 void lcd_command(int cmd)
 {
 	gpio_update(RS, 0);
 	lcd_write4bits(cmd);
-	udelay(2000); /* delai nécessaire pour certaines commandes */
+	usleep(2000); /* delai nécessaire pour certaines commandes */
 }
 
 void lcd_data(int character)
@@ -267,11 +269,11 @@ void lcd_set_cursor(int x, int y)
 }
 
 
-void lcd_set_cursor(int c, int l)
-{	
-	int DDRAM[4]={0x00,0x40,0x14,0x54};
-	lcd_command(LCD_SETDDRAMADDR+DDRAM[l%4]+c%0x14);
-}
+/* void lcd_set_cursor(int c, int l)*/
+/* {	*/
+/*         int DDRAM[4]={0x00,0x40,0x14,0x54};*/
+/*         lcd_command(LCD_SETDDRAMADDR+DDRAM[l%4]+c%0x14);*/
+/* }*/
 
 void lcd_message(char* txt)
 {

@@ -86,7 +86,6 @@ open_ledbp(struct inode *inode, struct file *file)
 static ssize_t 
 read_ledbp(struct file *file, char *buf, size_t count, loff_t *ppos)
 {
-
 	int i = 0;
 
 	printk(KERN_DEBUG "read()\n");
@@ -107,9 +106,6 @@ read_ledbp(struct file *file, char *buf, size_t count, loff_t *ppos)
 	return i;
 }
 
-
-
-
 static ssize_t 
 write_ledbp(struct file *file, const char *buf, size_t count, loff_t *ppos) 
 {
@@ -128,8 +124,6 @@ write_ledbp(struct file *file, const char *buf, size_t count, loff_t *ppos)
 			gpio_write(BUTTON0,buf[2]);
 			i++;
 		}
-	}
-
 	return i;
 }
 

@@ -1,5 +1,6 @@
 NAME=lee-fabre
 CARD=22
+LAB=lab1
 
 SRC=src
 OBJ=obj
@@ -28,24 +29,25 @@ ${LIB}:
 #hello_world
 $(BIN)/hello_world.x: $(SRC)/hello_world.c
 	$(CROSS_COMPILE)gcc -o $@ $< -I $(INC) -O2 -static
+
 #exercices sans lib
 $(BIN)/lab1_all_exercices.x: $(SRC)/lab1_all_exercices.c
 	$(CROSS_COMPILE)gcc -o $@ $< -I $(INC) -O2 -static
-#exercice 1 avec libgpio
-$(BIN)/lab1.x: $(SRC)/lab1.c
-	$(CROSS_COMPILE)gcc -o $@ $< -I $(INC) -O2 -static /users/enseig/lee/Desktop/TME_PERI-master/TP_01/lib/libgpio.a
 
+#exercice 1 avec libgpio
 #createur de lib
 $(LIB)/libgpio.a: $(OBJ)/gpio_value.o $(OBJ)/gpio_setup.o
 	$(CROSS_COMPILE)ar -rcs $@ $^
 
+$(BIN)/lab1.x: $(SRC)/lab1.c
+	$(CROSS_COMPILE)gcc -o $@ $< -I $(INC) -O2 -static $(LIB)/libgpio.a
 #regle de compilation
 $(OBJ)/%.o: $(SRC)/%.c
 	$(CROSS_COMPILE)gcc -o $@ -c $(CFLAGS) $< -I $(INC)
 
 #regle pour upload sur rbpy
 upload: $(BIN)/*.x
-	scp -P 50$(CARD) $^ pi@132.227.102.36:$(NAME)
+	scp -P 50$(CARD) $^ pi@132.227.102.36:$(NAME)/$(LAB)
 
 clean:
 	rm -f $(OBJ)/*.o $(BIN)/*.x $(SRC)/*~

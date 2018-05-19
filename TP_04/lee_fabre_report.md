@@ -32,7 +32,7 @@ Si on ferme la FIFO alors le programme C ne pourra ecrire dedans.
 Lis une ligne jusqu'a la fin de l'argument size ou jusqu'a un \n
 
 ###  Vous allez remarquer que lorsque le vous lancer un écrivain (en C ou en Pyhton) rien ne se passe tant que vous n'avez pas lancé un lecteur. Expliquez le phénomène.
-Si on ecrit sans qu'il n'y ait de lecteur alors on tombe dans le vide.
+Si on ecrit sans qu'il n'y ait de lecteur alors on tombe en attente.
 
 ## 2. Création d'un serveur fake
 ## 3. Création d'un serveur web

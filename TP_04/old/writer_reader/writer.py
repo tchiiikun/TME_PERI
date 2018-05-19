@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os, time
 
-pipe_name = '/tmp/myfifo_LF'
+pipe_name = '/tmp/myfifo42'
 
 if not os.path.exists(pipe_name):
     os.mkfifo(pipe_name)

@@ -6,18 +6,17 @@
 
 int main()
 {
-	int i;
 	int		fd;
-	char    *myfifo = "/tmp/myfifo_LF";
+	char    *myfifo = "/tmp/myfifo";
 
 	/* create the FIFO (named pipe) */
 	mkfifo(myfifo, 0666);
 
 	/* write "Hi" to the FIFO */
 	fd = open(myfifo, O_WRONLY);
-	for(i=0; i<5; i++) {
-		char    buf[80];
-		int len=sprintf(buf, "hello %d fois from c\n", i+1);
+    for(int i=0; i<5; i++) {
+        char    buf[80];
+        int len=sprintf(buf, "hello %d fois from c\n", i+1);
 		write(fd, buf, len);
 		sleep(1);
 	}

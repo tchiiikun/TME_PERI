@@ -11,9 +11,10 @@ if not os.path.exists(f2sName):
    os.mkfifo(f2sName)
 f2s = open(f2sName,'r')
 
-data = sys.stdin.readline()
-s2f.write(data)
+
+s2f.write(raw_input("Ecrivez votre message pour fake\n"))
 s2f.flush()
+
 str = f2s.readline()
 print '%s' % str,
 

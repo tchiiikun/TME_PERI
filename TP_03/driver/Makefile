@@ -3,8 +3,8 @@ ROUTER          = 132.227.102.36
 LOGIN           = lee-fabre
 LAB             = lab3
 
-TESTER          = lcd_uer_driver_LF
-MODULE          = lcd_user_driver
+TESTER          = lcd_suer_driver_LF
+MODULE          = lcd_user_LF
 
 CROSSDIR        = /users/enseig/franck/peri
 KERNELDIR       = /dsk/l1/misc/linux-rpi-3.18.y

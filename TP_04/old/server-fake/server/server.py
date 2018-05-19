@@ -5,7 +5,7 @@ import cgitb; cgitb.enable()
 
 server = BaseHTTPServer.HTTPServer
 handler = CGIHTTPServer.CGIHTTPRequestHandler
-server_address = ("", 8000)
+server_address = ("", 8100)
 handler.cgi_directories = ["/cgi-bin"]
 
 httpd = server(server_address, handler)
