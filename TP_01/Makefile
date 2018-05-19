@@ -1,5 +1,6 @@
 NAME=lee-fabre
 CARD=22
+LAB=lab1
 
 SRC=src
 OBJ=obj
@@ -46,7 +47,7 @@ $(OBJ)/%.o: $(SRC)/%.c
 
 #regle pour upload sur rbpy
 upload: $(BIN)/*.x
-	scp -P 50$(CARD) $^ pi@132.227.102.36:$(NAME)
+	scp -P 50$(CARD) $^ pi@132.227.102.36:$(NAME)/$(LAB)
 
 clean:
 	rm -f $(OBJ)/*.o $(BIN)/*.x $(SRC)/*~
