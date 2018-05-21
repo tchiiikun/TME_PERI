@@ -11,17 +11,23 @@ char bp[NBBP];
  
 int main()
 {
-   int i = 0;
+   int i;
    int fd = open("/dev/ledbpLF", O_RDWR);
    if (fd < 0) {
       fprintf(stderr, "Erreur d'ouverture du pilote LED et Boutons\n");
       exit(1);
    }
+   
+   for( i = 0; i < NBLED; i ++) {
+      led[i] = '0';
+   }
+   
    do { 
 	
 	read(fd, bp, 1);
 
 	if ( bp[0] == '1') {	
+		led[1] = '0';
 		/* Clignotement si appui */
 		led[0] = '0';
 		write(fd, led, 1);
@@ -29,6 +35,7 @@ int main()
 		led[0] = '1';
 		write(fd, led, 1);
 	} else {
+		led[0] = '0';
 		/* Clignotement si non appui */
 		led[1] = '0';
 		write(fd, led, 1);
@@ -36,8 +43,9 @@ int main()
 		led[1] = '1';
 		write(fd, led, 1);
 	}
-
 	sleep(1);
+   
    } while (1);
+   
    return 0;
 }
