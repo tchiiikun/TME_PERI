@@ -8,42 +8,85 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sqlite3.h>
 
 typedef uint8_t byte;
-
 using namespace std;
-
 RF24 radio(15,8); // radio(CE,CS)
-
 byte addresses[][6] = {"0XXXX"};
-
 int fd;
+char buffer[32];
+sqlite3 *db;
 
-void setup() {
-  radio.begin();
-  radio.setPALevel(RF24_PA_LOW);
-  radio.openReadingPipe(1, addresses[0]);
-  radio.printDetails();
-  radio.startListening();
+void setup()
+{
+	radio.begin();
+	radio.setPALevel(RF24_PA_LOW);
+	radio.openReadingPipe(1, addresses[0]);
+	radio.printDetails();
+	radio.startListening();
 }
 
-char buffer[32];
 
-void loop() {
-  if( radio.available()){
-	  radio.read( buffer, sizeof(buffer) );
-	  write(fd, buffer, sizeof(buffer) );	
-	  write(fd, "\n", 1);
-	  sleep(1);
+void loop()
+{
+	char *query = NULL;
+	char* sql_command;
+	char* date; // TODO CALCULER LA DATE
+	sqlite3_stmt *stmt;
+
+	if( radio.available()){
+		radio.read( buffer, sizeof(buffer) );
+		sql_command = "insert into lux (date, lumiere) values('%s', %d);";
+		asprintf(&query, sql_command, date, buffer);
+		ret = sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
+		if (ret != SQLITE_DONE){
+			fprintf(stderr, "problem on insetion of data");
+			goto out_write;
+		}
+
+		/* write(fd, buffer, sizeof(buffer) );*/
+		/* write(fd, "\n", 1);*/
+
+		sleep(1);
 	}
+out_write:
+		sqlite3_finalize(stmt);
+		free(query);
 }
 
 int main(int argc, char **argv)
 {
-	fd = open("test.txt", O_RDWR);
-  setup();
-  while (1){
+	int ret;
+	char *sql_command;
+	char * errmsg;
+	sqlite3_stmt *stmt;
+
+	/* fd = open("test.txt", O_RDWR);*/
+	setup();
+
+	ret = sqlite3_open("arduino_db", &db);
+	if ( ret != SQLITE_OK){
+		fprintf(stderr, "problem on open of database");
+		goto out;
+	}
+
+	sql_command = "CREATE TABLE lux (date TEXT, lumiere TEXT);";
+	sqlite3_prepare_v2(db, sql_command, -1, &stmt, NULL);
+	ret = sqlite3_step(stmt);
+	if (ret != SQLITE_DONE){
+		fprintf(stderr, "problem on insetion of data");
+		goto out_create;
+	}
+
+
+	while (1){
 		loop();
-  }
-  return 0;
+	}
+out_create:
+	sqlite3_finalize(stmt);
+
+out_open:
+	sqlite3_close(db);
+	return 0;
 }
