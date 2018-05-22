@@ -1,7 +1,7 @@
-RPI?=20
+RPI?=22
 SRC=src
 APP=NRF24L01_base
-DST=nom1_nom2
+DST=lee-fabre/lab7
 
 CROSSDIR        = /users/enseig/franck/peri
 CROSS_COMPILE   = $(CROSSDIR)/arm-bcm2708hardfp-linux-gnueabi/bin/bcm2708hardfp-
