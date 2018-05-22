@@ -20,14 +20,21 @@ int main()
 {
 	int fd_in, fd_out;
 
-	/* fd_out = fd_in = open("/dev/ledbpLF", O_RDWR);*/
-	/* if (fd_in < 0) {*/
-	/*         fprintf(stderr, "Erreur d'ouverture du pilote LED et Boutons\n");*/
-	/*         exit(1);*/
-	/* }*/
+	 fd_in = open("/dev/ledbpLF", O_RDONLY);
+	 if (fd_in < 0) {
+	         fprintf(stderr, "Erreur d'ouverture du pilote LED et Boutons\n");
+	         exit(1);
+	 }
+
+	 fd_out = open("/dev/ledbpLF", O_RDWR);
+	 if (fd_out < 0) {
+	         fprintf(stderr, "Erreur d'ouverture du pilote LED et Boutons\n");
+	         exit(1);
+	 }
+
 
 	fd_in = 0;
-	fd_out = 1;
+	//fd_out = 1;
 	server(fd_in, fd_out, bp, led);
 	return 0;
 }
@@ -55,12 +62,16 @@ int server(int fd_in, int fd_out, char *bp2f2s, char *s2f2led)
 	int bool_fd_in = 0;
 	int bool_fd_in_prec = 0;
 
+	/* si on utilise le BP*/
+	/* char bp2f2s_prec[1024]*/
+
 	mkfifo(s2fName, 0666);                                  // fifo creation
 	mkfifo(f2sName, 0666);
 
 	/* open both fifos */
 	s2f = open(s2fName, O_RDWR);                            // fifo openning
 	f2s = open(f2sName, O_RDWR);
+	printf("before while\n");
 
 	do {
 		/* initialise s2f */
@@ -77,12 +88,22 @@ int server(int fd_in, int fd_out, char *bp2f2s, char *s2f2led)
 
 		/* check if this turn there is something */
 		if (bool_fd_in){
+			printf("ecriture depuis stdin\n");
 			nbchar_fd_in = read(fd_in, bp2f2s, MAXServerResquest);
-			if (bp2f2s[0] == '1')
+			if (bp2f2s[0] == '0'){
 				bool_fd_in_prec = 1;
-			write(f2s, bp2f2s, nbchar_fd_in);
+				printf("bouton lol\n");
+			}
+			bool_fd_in_prec = 1;
 			bool_fd_in = 0;
 		}
+		/* Si on veut faire fonctionner avec le bouton poussoir il faut
+		 * verifier la difference entre le buffer a l'etat actuel et le
+		 * buffer a l'etat precedent pour savoir si quelqu'un a appuye
+		 * sur le bouton sans bloquer le programme.
+		 */
+
+		/* if (bool_s2f && bp2f2s[0] !=  bp2f2s_prec[0]) { */
 
 		/* check if there have been somthing previously on fd_in and if
 		 * there is something of s2f */
@@ -91,10 +112,22 @@ int server(int fd_in, int fd_out, char *bp2f2s, char *s2f2led)
 			nbchar_s2f = read(s2f, s2f2led, MAXServerResquest);
 			if (nbchar_s2f == 0)
 				break;
-			s2f2led[nbchar_s2f] = 0;
-			write(fd_out, s2f2led, nbchar_s2f);
+			if (s2f2led[0] !='0'){
+				printf("que la lumiere soit : %c \n", s2f2led[0]);	
+				led[0] = '1';
+				led[1] = '1';
+			} else {
+				printf("eteindre: %c \n", s2f2led[0]);	
+				led[0] = '0';
+				led[1] = '0';
+			}
+			write(fd_out, led, 2);
+			write(f2s, bp2f2s, nbchar_fd_in);
 			bool_s2f = bool_fd_in = bool_fd_in_prec = 0;
 		}
+		/* decommenter pour le bouton poussoir */
+		/* bp2f2s_prec[0] = bp2f2s[0];*/
+		/* bp2f2s[0] = 'x';*/
 	} while (1);
 
 	close(f2s);
@@ -104,6 +137,7 @@ int server(int fd_in, int fd_out, char *bp2f2s, char *s2f2led)
 
 }
 
+/* fonction inutile mais factorisee, elle monitor sur un fd. */
 void monitor(fd_set set, struct timeval tv, int from, int to, char *buf)
 {
 	int nbchar;

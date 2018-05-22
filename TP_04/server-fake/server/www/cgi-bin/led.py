@@ -9,10 +9,9 @@ f2s = open(f2sName,'r',0)
 
 val = form.getvalue('val')
 
-s2f.write("w %s\n" % val)
+s2f.write("%s\n" % val)
 s2f.flush()
-res = f2s.readline()
-sys.stdout.write(res)
+# res = f2s.readline()
 f2s.close()
 s2f.close()
 
