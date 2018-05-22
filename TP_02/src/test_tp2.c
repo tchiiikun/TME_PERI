@@ -26,22 +26,22 @@ int main()
 	
 	read(fd, bp, 1);
 
-	if ( bp[0] == '1') {	
-		led[1] = '0';
-		/* Clignotement si appui */
+	if ( bp[0] == '1') {
+		/* Clignotement si appui */	
 		led[0] = '0';
 		write(fd, led, 1);
 		sleep(1);
 		led[0] = '1';
 		write(fd, led, 1);
+		sleep(1);
 	} else {
-		led[0] = '0';
 		/* Clignotement si non appui */
 		led[1] = '0';
 		write(fd, led, 1);
 		sleep(1);
 		led[1] = '1';
 		write(fd, led, 1);
+		sleep(1);
 	}
 	sleep(1);
    
