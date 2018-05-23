@@ -31,16 +31,16 @@ void setup()
 void loop()
 {
 	char *query = NULL;
-	char* date; // TODO CALCULER LA DATE
+	//~ char* date; // TODO CALCULER LA DATE
 	sqlite3_stmt *stmt;
 	int ret;
 
 	if( radio.available()){
 		radio.read( buffer, sizeof(buffer) );
-		asprintf(&query, "insert into lux (date, lumiere) values('%s', %d);", date, buffer);
+		asprintf(&query, "insert into lux (lumiere) values('%s');", buffer);
 		ret = sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
 		if (ret != SQLITE_DONE){
-			fprintf(stderr, "problem on insetion of data");
+			fprintf(stderr, "problem on insertion of data");
 			goto out_write;
 		}
 
