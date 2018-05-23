@@ -31,14 +31,13 @@ void setup()
 void loop()
 {
 	char *query = NULL;
-	char* sql_command;
 	char* date; // TODO CALCULER LA DATE
 	sqlite3_stmt *stmt;
+	int ret;
 
 	if( radio.available()){
 		radio.read( buffer, sizeof(buffer) );
-		sql_command = "insert into lux (date, lumiere) values('%s', %d);";
-		asprintf(&query, sql_command, date, buffer);
+		asprintf(&query, "insert into lux (date, lumiere) values('%s', %d);", date, buffer);
 		ret = sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
 		if (ret != SQLITE_DONE){
 			fprintf(stderr, "problem on insetion of data");
@@ -58,7 +57,6 @@ out_write:
 int main(int argc, char **argv)
 {
 	int ret;
-	char *sql_command;
 	char * errmsg;
 	sqlite3_stmt *stmt;
 
@@ -68,17 +66,15 @@ int main(int argc, char **argv)
 	ret = sqlite3_open("arduino_db", &db);
 	if ( ret != SQLITE_OK){
 		fprintf(stderr, "problem on open of database");
-		goto out;
+		goto out_open;
 	}
 
-	sql_command = "CREATE TABLE lux (date TEXT, lumiere TEXT);";
-	sqlite3_prepare_v2(db, sql_command, -1, &stmt, NULL);
+	sqlite3_prepare_v2(db, "CREATE TABLE lux (date TEXT, lumiere TEXT);", -1, &stmt, NULL);
 	ret = sqlite3_step(stmt);
 	if (ret != SQLITE_DONE){
 		fprintf(stderr, "problem on insetion of data");
 		goto out_create;
 	}
-
 
 	while (1){
 		loop();
