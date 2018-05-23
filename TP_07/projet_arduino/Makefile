@@ -24,6 +24,8 @@ up:
 
 upmake: 
 	scp -P50$(RPI) Makefile pi@peri:$(DST)
+tarup:
+	scp -P50$(RPI) server.tar pi@peri:$(DST)
 
 
 clean:
