@@ -21,15 +21,17 @@ Cette valeur va plus tard être écrite dans le NRF24L01 de l'Arduino pour que l
 Pour pouvoir écrire dans le NRF24L01, il a fallu faire :
 
 Dans le setup() : 
->	radio.openWritingPipe(addresses[0]);
->	permet d'ouvrir un pipe en écriture
->	
->	radio.stopListening();
->	permet de stopper l'écoute du NRF24L01 pour permettre ensuite l'ecriture
+
+	radio.openWritingPipe(addresses[0]);
+	permet d'ouvrir un pipe en écriture
+	
+	radio.stopListening();
+	permet de stopper l'écoute du NRF24L01 pour permettre ensuite l'ecriture
 
 Dans la loop() : 
->	radio.write( ctx->mess, sizeof(ctx->mess) );
->	permet d'écrire dans le NRF24L01 le valeur du capteur de lumière précédemment convertit en String 
+
+	radio.write( ctx->mess, sizeof(ctx->mess) );
+	permet d'écrire dans le NRF24L01 le valeur du capteur de lumière précédemment convertit en String 
 
 &nbsp;
 
@@ -61,6 +63,20 @@ Ensuite dans une boucle infinie, chaque valeur va être insérée dans la base d
 
 ## Code de la partie Web
 
-Fichier web.py : 
+### Fichier web.py :
 
-Fichier graph.html : 
+Ce fichier utilise `Flask` qui est un framework de développement web en Python permettant d'utiliser des templates et `JSON` qui est un format de données textuelles dérivé de la notation des objets du langage JavaScript.
+
+Nous avons défini deux fonctions dans ce fichier :
+
+- data() permet de récupérer les données de la base de données 
+
+		cursor.execute("SELECT 1000*time, lumiere from Ard")
+
+- graph() permet de faire faire appel au fichier HTML : graph.html
+
+	 	return render_template('graph.html')
+
+### Fichier graph.html : 
+
+Ce fichier permet de faire afficher sous la forme d'un graphe les données récupérées.
