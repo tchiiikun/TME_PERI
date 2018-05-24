@@ -22,15 +22,34 @@ Pour pouvoir écrire dans le NRF24L01, il a fallu faire :
 
 Dans le setup() : 
 >	radio.openWritingPipe(addresses[0]);
->	qui permet d'ouvrir un pipe en écriture
+>	permet d'ouvrir un pipe en écriture
 >	
 >	radio.stopListening();
->	qui permet de stopper l'écoute du NRF24L01 pour permettre ensuite l'ecriture
+>	permet de stopper l'écoute du NRF24L01 pour permettre ensuite l'ecriture
 
 Dans la loop() : 
 >	radio.write( ctx->mess, sizeof(ctx->mess) );
->	qui permet d'écrire dans le NRF le valeur du capteur de lumière précédemment convertit en String 
+>	permet d'écrire dans le NRF24L01 le valeur du capteur de lumière précédemment convertit en String 
 
 &nbsp;
 
 ## Code NRF24L01_base.cpp
+
+Dans le fichier NRF24L01_base.cpp, nous écrivons dans une base de données les valeurs du capteur de lumière et le temps actuel au format Heure:Minutes:Secondes, qui va nous être utile pour dessiner le graphe en fonction du temps.
+
+Dans un premier temps, nous avons crée une table de la base de donnée avec :
+`sqlite3_exec(db, "CREATE TABLE Ard(time INT, lumiere INT);", 0, 0, &errmsg);` 
+qui contient deux colonnes, une pour le temps actuel et l'autre pour la donnée du capteur de lumière.
+
+Ensuite dans une boucle infinie, chaque valeur va être insérée dans la base de donnée dans la colonne dédiée: 
+`sprintf(query, "INSERT INTO Ard VALUES(strftime('%s', 'now'), %d);","%s", verification);`
+
+Nous avons utilisé différentes fonctions de SQlite3 pour créer notre base de données :
+
+&nbsp;
+
+## Code de la partie Web
+
+Fichier web.py : 
+
+Fichier graph.html : 
