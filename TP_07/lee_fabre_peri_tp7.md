@@ -58,6 +58,13 @@ Ensuite dans une boucle infinie, chaque valeur va être insérée dans la base d
 	sprintf(query, "INSERT INTO Ard VALUES(strftime('%s', 'now'), %d);","%s", verification);
 	sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
 	sqlite3_step(stmt);
+	
+Dans cette première ligne on peut voir qu'il nous faut utiliser un `sprintf` pour écrire la query dans une string qui elle sera pasée à une fonction C qui va l'envoyer à la database. Le première paramètre de sprintf est "%s" car sprintf essayait d'écrire le second paramètre dans le premier '%s' de la commande sql `strftime` qui donne le temps depuis `EPOCH`.
+`INSERT` va insérer dans la base de donnée nommée Ard les valeurs en paramètre.
+Nous avons fait ce programme en C car nous lisions déjà en C les informations envoyées par l'Arduino et il était assez pratique de les écrire directement dans une databse avec `SQLITE3, l'interface est assez claire et nos opérations sont très simples.
+On Ouvre la DB, on remplie les champs pour le temps et la valeur du capteurs pour avoir une `timestamp` par résultat. Puis on appelle loop qui va remplir la DB en `temps réel`.
+Petit soucis l'arduino renvoie parfois des valeurs mauvaises à 0 (impossible) ou plusieurs milliards (impossible) alors on sauvegarde la valeur précédente lu par la raspberry et si la valeur actuelle est trop extrême alors on la remplace par la valeur précédente.
+
 
 &nbsp;
 
@@ -65,18 +72,21 @@ Ensuite dans une boucle infinie, chaque valeur va être insérée dans la base d
 
 ### Fichier web.py :
 
-Ce fichier utilise `Flask` qui est un framework de développement web en Python permettant d'utiliser des templates et `JSON` qui est un format de données textuelles dérivé de la notation des objets du langage JavaScript.
+Ce fichier utilise `Flask` qui est un framework de développement web en Python permettant d'utiliser des templates et `JSON` qui est un format de données textuelles dérivé de la notation des objets du langage JavaScript. l'interface proposée par Flask est simple : un dossier templates, un dossier static et un fichier qui sert a serveur web en python et qui appellera dans templates la page à générer et déclarera une fonnction et un point d'accès vers cette page/fonction dans l'URL. Elle va aussi déclarer une fonnction pour appeler les fichiers json qui eux seront utilisé dans une div du template en HTML pour afficher par exemple ici un graph.
 
-Nous avons défini deux fonctions dans ce fichier :
+Nous avons défini deux fonctions dans le fichier python:
 
 - data() permet de récupérer les données de la base de données 
 
-		cursor.execute("SELECT 1000*time, lumiere from Ard")
+		cursor.execute("SELECT 1000*time, lumiere from Ard") 	// Va récupérer la donnnée dans la base de donnée et
+									// multiplie par 1000 pour tenter de corriger l'heure
+									// mais en vain.
 
 - graph() permet de faire faire appel au fichier HTML : graph.html
 
-	 	return render_template('graph.html')
+	 	return render_template('graph.html') // Va renvoyer vers la page graph.html si l'URL est XXXXXX/graph
 
 ### Fichier graph.html : 
 
 Ce fichier permet de faire afficher sous la forme d'un graphe les données récupérées.
+C'est une fichier HTML simple avec du json qui sert a mettre le graphique dans le body. Nous avons récupérer ce fichier avec un template préfait pour flask ce qui fut extrêmement pratique pour implémenter notre solution.
