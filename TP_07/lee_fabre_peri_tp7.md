@@ -35,16 +35,27 @@ Dans la loop() :
 
 ## Code NRF24L01_base.cpp
 
-Dans le fichier NRF24L01_base.cpp, nous écrivons dans une base de données les valeurs du capteur de lumière et le temps actuel au format Heure:Minutes:Secondes, qui va nous être utile pour dessiner le graphe en fonction du temps.
+Dans le fichier NRF24L01_base.cpp, nous lisons les données envoyées par le NRF24L01 de l'Arduino avec les commandes qui ne lisent seulement si une donnée est valable :
+
+	if( radio.available()){
+		radio.read( buffer, sizeof(buffer) );	
+	}
+
+Nous écrivons par la suite dans une base de données les valeurs du capteur de lumière et le temps actuel au format Heure:Minutes:Secondes, qui va nous être utile pour dessiner le graphe en fonction du temps.
+
+Nous avons utilisé différentes fonctions de SQlite3 pour créer notre base de données :
 
 Dans un premier temps, nous avons crée une table de la base de donnée avec :
-`sqlite3_exec(db, "CREATE TABLE Ard(time INT, lumiere INT);", 0, 0, &errmsg);` 
+
+	sqlite3_exec(db, "CREATE TABLE Ard(time INT, lumiere INT);", 0, 0, &errmsg);
+
 qui contient deux colonnes, une pour le temps actuel et l'autre pour la donnée du capteur de lumière.
 
 Ensuite dans une boucle infinie, chaque valeur va être insérée dans la base de donnée dans la colonne dédiée: 
-`sprintf(query, "INSERT INTO Ard VALUES(strftime('%s', 'now'), %d);","%s", verification);`
 
-Nous avons utilisé différentes fonctions de SQlite3 pour créer notre base de données :
+	sprintf(query, "INSERT INTO Ard VALUES(strftime('%s', 'now'), %d);","%s", verification);
+	sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
+	sqlite3_step(stmt);
 
 &nbsp;
 
