@@ -41,7 +41,7 @@ void loop()
 
 		radio.read( buffer, sizeof(buffer) );
 		query = (char*) (malloc(1024*sizeof(char)));
-		verification = atoi(buffer) % 600;
+		verification = atoi(buffer) % 1200; // valeur max de la luminosite pour eviter d'avoir des trop grosses valeurs.
 
 		if (verification ==  0){
 			verification = prec;
